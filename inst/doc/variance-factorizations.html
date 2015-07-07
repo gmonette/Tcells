@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="author" content="Georges Monette georges@yorku.ca" />
+
+<meta name="date" content="2015-07-07" />
+
+<title>Variance Factorizations</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<link href="data:text/css,body%20%7B%0A%20%20background%2Dcolor%3A%20%23fff%3B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20max%2Dwidth%3A%20700px%3B%0A%20%20overflow%3A%20visible%3B%0A%20%20padding%2Dleft%3A%202em%3B%0A%20%20padding%2Dright%3A%202em%3B%0A%20%20font%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0A%20%20font%2Dsize%3A%2014px%3B%0A%20%20line%2Dheight%3A%201%2E35%3B%0A%7D%0A%0A%23header%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0A%0A%23TOC%20%7B%0A%20%20clear%3A%20both%3B%0A%20%20margin%3A%200%200%2010px%2010px%3B%0A%20%20padding%3A%204px%3B%0A%20%20width%3A%20400px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20border%2Dradius%3A%205px%3B%0A%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20font%2Dsize%3A%2013px%3B%0A%20%20line%2Dheight%3A%201%2E3%3B%0A%7D%0A%20%20%23TOC%20%2Etoctitle%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%20%20font%2Dsize%3A%2015px%3B%0A%20%20%20%20margin%2Dleft%3A%205px%3B%0A%20%20%7D%0A%0A%20%20%23TOC%20ul%20%7B%0A%20%20%20%20padding%2Dleft%3A%2040px%3B%0A%20%20%20%20margin%2Dleft%3A%20%2D1%2E5em%3B%0A%20%20%20%20margin%2Dtop%3A%205px%3B%0A%20%20%20%20margin%2Dbottom%3A%205px%3B%0A%20%20%7D%0A%20%20%23TOC%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dleft%3A%20%2D2em%3B%0A%20%20%7D%0A%20%20%23TOC%20li%20%7B%0A%20%20%20%20line%2Dheight%3A%2016px%3B%0A%20%20%7D%0A%0Atable%20%7B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dcolor%3A%20%23DDDDDD%3B%0A%20%20border%2Dstyle%3A%20outset%3B%0A%20%20border%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0A%20%20border%2Dwidth%3A%202px%3B%0A%20%20padding%3A%205px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%20%20line%2Dheight%3A%2018px%3B%0A%20%20padding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0A%20%20border%2Dleft%2Dstyle%3A%20none%3B%0A%20%20border%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Ap%20%7B%0A%20%20margin%3A%200%2E5em%200%3B%0A%7D%0A%0Ablockquote%20%7B%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20padding%3A%200%2E25em%200%2E75em%3B%0A%7D%0A%0Ahr%20%7B%0A%20%20border%2Dstyle%3A%20solid%3B%0A%20%20border%3A%20none%3B%0A%20%20border%2Dtop%3A%201px%20solid%20%23777%3B%0A%20%20margin%3A%2028px%200%3B%0A%7D%0A%0Adl%20%7B%0A%20%20margin%2Dleft%3A%200%3B%0A%7D%0A%20%20dl%20dd%20%7B%0A%20%20%20%20margin%2Dbottom%3A%2013px%3B%0A%20%20%20%20margin%2Dleft%3A%2013px%3B%0A%20%20%7D%0A%20%20dl%20dt%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%7D%0A%0Aul%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%7D%0A%20%20ul%20li%20%7B%0A%20%20%20%20list%2Dstyle%3A%20circle%20outside%3B%0A%20%20%7D%0A%20%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dbottom%3A%200%3B%0A%20%20%7D%0A%0Apre%2C%20code%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20color%3A%20%23333%3B%0A%7D%0Apre%20%7B%0A%20%20white%2Dspace%3A%20pre%2Dwrap%3B%20%20%20%20%2F%2A%20Wrap%20long%20lines%20%2A%2F%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20margin%3A%205px%200px%2010px%200px%3B%0A%20%20padding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Acode%20%7B%0A%20%20font%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0A%20%20font%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0A%20%20padding%3A%202px%200px%3B%0A%7D%0A%0Adiv%2Efigure%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0A%20%20background%2Dcolor%3A%20%23FFFFFF%3B%0A%20%20padding%3A%202px%3B%0A%20%20border%3A%201px%20solid%20%23DDDDDD%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20margin%3A%200%205px%3B%0A%7D%0A%0Ah1%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%20%20font%2Dsize%3A%2035px%3B%0A%20%20line%2Dheight%3A%2040px%3B%0A%7D%0A%0Ah2%20%7B%0A%20%20border%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20padding%2Dbottom%3A%202px%3B%0A%20%20font%2Dsize%3A%20145%25%3B%0A%7D%0A%0Ah3%20%7B%0A%20%20border%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20font%2Dsize%3A%20120%25%3B%0A%7D%0A%0Ah4%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0A%20%20margin%2Dleft%3A%208px%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Ah5%2C%20h6%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23ccc%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Aa%20%7B%0A%20%20color%3A%20%230033dd%3B%0A%20%20text%2Ddecoration%3A%20none%3B%0A%7D%0A%20%20a%3Ahover%20%7B%0A%20%20%20%20color%3A%20%236666ff%3B%20%7D%0A%20%20a%3Avisited%20%7B%0A%20%20%20%20color%3A%20%23800080%3B%20%7D%0A%20%20a%3Avisited%3Ahover%20%7B%0A%20%20%20%20color%3A%20%23BB00BB%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%0A%2F%2A%20Class%20described%20in%20https%3A%2F%2Fbenjeffrey%2Ecom%2Fposts%2Fpandoc%2Dsyntax%2Dhighlighting%2Dcss%0A%20%20%20Colours%20from%20https%3A%2F%2Fgist%2Egithub%2Ecom%2Frobsimmons%2F1172277%20%2A%2F%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Keyword%20%2A%2F%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%2F%2A%20DataType%20%2A%2F%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%2F%2A%20DecVal%20%28decimal%20values%29%20%2A%2F%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20BaseN%20%2A%2F%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Float%20%2A%2F%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Char%20%2A%2F%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20String%20%2A%2F%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%2F%2A%20Comment%20%2A%2F%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%2F%2A%20OtherToken%20%2A%2F%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20AlertToken%20%2A%2F%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Function%20calls%20%2A%2F%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%2F%2A%20ErrorTok%20%2A%2F%0A%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+<div id="header">
+<h1 class="title">Variance Factorizations</h1>
+<h4 class="author"><em>Georges Monette <a href="mailto:georges@yorku.ca">georges@yorku.ca</a></em></h4>
+<h4 class="date"><em>2015-07-07</em></h4>
+</div>
+
+
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(magrittr)</code></pre>
+<div id="triangular-factorizations" class="section level2">
+<h2>Triangular factorizations</h2>
+<p><span class="math">\[\begin{gathered}
+  {\left[ {\begin{array}{*{20}{c}}
+  {{A_{00}}}&amp;0&amp;0&amp;0 \\ 
+  {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
+  {{A_{20}}}&amp;{{A_{21}}}&amp;{{A_{22}}}&amp;0 \\ 
+  {{A_{30}}}&amp;{{A_{31}}}&amp;{{A_{32}}}&amp;{{A_{33}}} 
+\end{array}} \right]^\prime }\left[ {\begin{array}{*{20}{c}}
+  {{A_{00}}}&amp;0&amp;0&amp;0 \\ 
+  {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
+  {{A_{20}}}&amp;{{A_{21}}}&amp;{{A_{22}}}&amp;0 \\ 
+  {{A_{30}}}&amp;{{A_{31}}}&amp;{{A_{32}}}&amp;{{A_{33}}} 
+\end{array}} \right] = {\left[ {\begin{array}{*{20}{c}}
+  {{{A'}_{00}}}&amp;{{{A'}_{10}}}&amp;{{{A'}_{20}}}&amp;{{{A'}_{30}}} \\ 
+  0&amp;{{{A'}_{11}}}&amp;{{{A'}_{21}}}&amp;{{{A'}_{31}}} \\ 
+  0&amp;0&amp;{{{A'}_{22}}}&amp;{{{A'}_{32}}} \\ 
+  0&amp;0&amp;0&amp;{{{A'}_{33}}} 
+\end{array}} \right]^\prime }\left[ {\begin{array}{*{20}{c}}
+  {{A_{00}}}&amp;0&amp;0&amp;0 \\ 
+  {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
+  {{A_{20}}}&amp;{{A_{21}}}&amp;{{A_{22}}}&amp;0 \\ 
+  {{A_{30}}}&amp;{{A_{31}}}&amp;{{A_{32}}}&amp;{{A_{33}}} 
+\end{array}} \right] \hfill \\
+   = \left[ {\begin{array}{*{20}{c}}
+  {{{A'}_{00}}{A_{00}} + {{A'}_{10}}{A_{10}} + {{A'}_{20}}{A_{20}} + {{A'}_{30}}{A_{30}}}&amp;{}&amp;{}&amp;{} \\ 
+  {{{A'}_{11}}{A_{10}} + {{A'}_{21}}{A_{20}} + {{A'}_{31}}{A_{30}}}&amp;{{{A'}_{11}}{A_{11}} + {{A'}_{21}}{A_{21}} + {{A'}_{31}}{A_{31}}}&amp;{}&amp;{} \\ 
+  {{{A'}_{22}}{A_{20}} + {{A'}_{32}}{A_{30}}}&amp;{{{A'}_{22}}{A_{21}} + {{A'}_{32}}{A_{31}}}&amp;{{{A'}_{22}}{A_{22}} + {{A'}_{32}}{A_{32}}}&amp;{} \\ 
+  {{{A'}_{33}}{A_{30}}}&amp;{{{A'}_{33}}{A_{31}}}&amp;{{{A'}_{33}}{A_{32}}}&amp;{{{A'}_{33}}{A_{33}}} 
+\end{array}} \right] \hfill \\ 
+\end{gathered} \]</span></p>
+<p><span class="math">\[\begin{gathered}
+  {\left[ {\begin{array}{*{20}{c}}
+  {{A_{00}}}&amp;0&amp;0&amp;0 \\ 
+  {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
+  {{A_{20}}}&amp;{{A_{21}}}&amp;{{A_{22}}}&amp;0 \\ 
+  {{A_{30}}}&amp;{{A_{31}}}&amp;{{0_{32}}}&amp;{{A_{33}}} 
+\end{array}} \right]^\prime }\left[ {\begin{array}{*{20}{c}}
+  {{A_{00}}}&amp;0&amp;0&amp;0 \\ 
+  {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
+  {{A_{20}}}&amp;{{A_{21}}}&amp;{{A_{22}}}&amp;0 \\ 
+  {{A_{30}}}&amp;{{A_{31}}}&amp;{{0_{32}}}&amp;{{A_{33}}} 
+\end{array}} \right] = {\left[ {\begin{array}{*{20}{c}}
+  {{{A'}_{00}}}&amp;{{{A'}_{10}}}&amp;{{{A'}_{20}}}&amp;{{{A'}_{30}}} \\ 
+  0&amp;{{{A'}_{11}}}&amp;{{{A'}_{21}}}&amp;{{{A'}_{31}}} \\ 
+  0&amp;0&amp;{{{A'}_{22}}}&amp;{{{0'}_{32}}} \\ 
+  0&amp;0&amp;0&amp;{{{A'}_{33}}} 
+\end{array}} \right]^\prime }\left[ {\begin{array}{*{20}{c}}
+  {{A_{00}}}&amp;0&amp;0&amp;0 \\ 
+  {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
+  {{A_{20}}}&amp;{{A_{21}}}&amp;{{A_{22}}}&amp;0 \\ 
+  {{A_{30}}}&amp;{{A_{31}}}&amp;{{0_{32}}}&amp;{{A_{33}}} 
+\end{array}} \right] \hfill \\
+   = \left[ {\begin{array}{*{20}{c}}
+  {{{A'}_{00}}{A_{00}} + {{A'}_{10}}{A_{10}} + {{A'}_{20}}{A_{20}} + {{A'}_{30}}{A_{30}}}&amp;{}&amp;{}&amp;{} \\ 
+  {{{A'}_{11}}{A_{10}} + {{A'}_{21}}{A_{20}} + {{A'}_{31}}{A_{30}}}&amp;{{{A'}_{11}}{A_{11}} + {{A'}_{21}}{A_{21}} + {{A'}_{31}}{A_{31}}}&amp;{}&amp;{} \\ 
+  {{{A'}_{22}}{A_{20}} + {{0'}_{32}}{A_{30}}}&amp;{{{A'}_{22}}{A_{21}} + {{0'}_{32}}{A_{31}}}&amp;{{{A'}_{22}}{A_{22}} + {{0'}_{32}}{0_{32}}}&amp;{} \\ 
+  {{{A'}_{33}}{A_{30}}}&amp;{{{A'}_{33}}{A_{31}}}&amp;{{{A'}_{33}}{0_{32}}}&amp;{{{A'}_{33}}{A_{33}}} 
+\end{array}} \right] \hfill \\ 
+\end{gathered} \]</span></p>
+<p><span class="math">\[\begin{gathered}
+  {\left[ {\begin{array}{*{20}{c}}
+  {{A_{00}}}&amp;0&amp;0&amp;0 \\ 
+  {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
+  {{A_{20}}}&amp;{{0_{21}}}&amp;{{A_{22}}}&amp;0 \\ 
+  {{A_{30}}}&amp;{{A_{31}}}&amp;{{0_{32}}}&amp;{{A_{33}}} 
+\end{array}} \right]^\prime }\left[ {\begin{array}{*{20}{c}}
+  {{A_{00}}}&amp;0&amp;0&amp;0 \\ 
+  {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
+  {{A_{20}}}&amp;{{0_{21}}}&amp;{{A_{22}}}&amp;0 \\ 
+  {{A_{30}}}&amp;{{A_{31}}}&amp;{{0_{32}}}&amp;{{A_{33}}} 
+\end{array}} \right] = {\left[ {\begin{array}{*{20}{c}}
+  {{{A'}_{00}}}&amp;{{{A'}_{10}}}&amp;{{{A'}_{20}}}&amp;{{{A'}_{30}}} \\ 
+  0&amp;{{{A'}_{11}}}&amp;{{{0'}_{21}}}&amp;{{{A'}_{31}}} \\ 
+  0&amp;0&amp;{{{A'}_{22}}}&amp;{{{0'}_{32}}} \\ 
+  0&amp;0&amp;0&amp;{{{A'}_{33}}} 
+\end{array}} \right]^\prime }\left[ {\begin{array}{*{20}{c}}
+  {{A_{00}}}&amp;0&amp;0&amp;0 \\ 
+  {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
+  {{A_{20}}}&amp;{{0_{21}}}&amp;{{A_{22}}}&amp;0 \\ 
+  {{A_{30}}}&amp;{{A_{31}}}&amp;{{0_{32}}}&amp;{{A_{33}}} 
+\end{array}} \right] \hfill \\
+   = \left[ {\begin{array}{*{20}{c}}
+  {{{A'}_{00}}{A_{00}} + {{A'}_{10}}{A_{10}} + {{A'}_{20}}{A_{20}} + {{A'}_{30}}{A_{30}}}&amp;{}&amp;{}&amp;{} \\ 
+  {{{A'}_{11}}{A_{10}} + {{0'}_{21}}{A_{20}} + {{A'}_{31}}{A_{30}}}&amp;{{{A'}_{11}}{A_{11}} + {{0'}_{21}}{0_{21}} + {{A'}_{31}}{A_{31}}}&amp;{}&amp;{} \\ 
+  {{{A'}_{22}}{A_{20}} + {{0'}_{32}}{A_{30}}}&amp;{{{A'}_{22}}{0_{21}} + {{0'}_{32}}{A_{31}}}&amp;{{{A'}_{22}}{A_{22}} + {{0'}_{32}}{0_{32}}}&amp;{} \\ 
+  {{{A'}_{33}}{A_{30}}}&amp;{{{A'}_{33}}{A_{31}}}&amp;{{{A'}_{33}}{0_{32}}}&amp;{{{A'}_{33}}{A_{33}}} 
+\end{array}} \right] \hfill \\ 
+\end{gathered} \]</span></p>
+<p><span class="math">\[\begin{gathered}
+  \left[ {\begin{array}{*{20}{c}}
+  {{a_{11}}}&amp;{{a_{21}}}&amp;{{a_{31}}}&amp;{{a_{41}}}&amp;{{a_{51}}} \\ 
+  0&amp;{{a_{22}}}&amp;{{a_{32}}}&amp;{{a_{42}}}&amp;{{a_{52}}} \\ 
+  0&amp;0&amp;{{a_{33}}}&amp;{{a_{43}}}&amp;{{a_{53}}} \\ 
+  0&amp;0&amp;0&amp;{{a_{44}}}&amp;{{a_{54}}} \\ 
+  0&amp;0&amp;0&amp;0&amp;{{a_{55}}} 
+\end{array}} \right]\left[ {\begin{array}{*{20}{c}}
+  {{a_{11}}}&amp;0&amp;0&amp;0&amp;0 \\ 
+  {{a_{21}}}&amp;{{a_{22}}}&amp;0&amp;0&amp;0 \\ 
+  {{a_{31}}}&amp;{{a_{32}}}&amp;{{a_{33}}}&amp;0&amp;0 \\ 
+  {{a_{41}}}&amp;{{a_{42}}}&amp;{{a_{43}}}&amp;{{a_{44}}}&amp;0 \\ 
+  {{a_{51}}}&amp;{{a_{52}}}&amp;{{a_{53}}}&amp;{{a_{54}}}&amp;{{a_{55}}} 
+\end{array}} \right] \hfill \\
+   = \left[ {\begin{array}{*{20}{c}}
+  {a_{11}^2 + a_{21}^2 + a_{31}^2 + a_{41}^2 + a_{51}^2}&amp;{}&amp;{}&amp;{}&amp;{} \\ 
+  {{a_{22}}{a_{21}} + {a_{32}}{a_{31}} + {a_{42}}{a_{41}} + {a_{52}}{a_{51}}}&amp;{a_{22}^2 + a_{32}^2 + a_{42}^2 + a_{52}^2}&amp;{}&amp;{}&amp;{} \\ 
+  {{a_{33}}{a_{31}} + {a_{43}}{a_{41}} + {a_{53}}{a_{51}}}&amp;{{a_{33}}{a_{32}} + {a_{43}}{a_{42}} + {a_{53}}{a_{52}}}&amp;{a_{33}^2 + a_{43}^2 + a_{53}^2}&amp;{}&amp;{} \\ 
+  {{a_{44}}{a_{41}} + {a_{54}}{a_{51}}}&amp;{{a_{44}}{a_{42}} + {a_{54}}{a_{52}}}&amp;{{a_{44}}{a_{43}} + {a_{54}}{a_{53}}}&amp;{a_{44}^2 + a_{54}^2}&amp;{} \\ 
+  {{a_{55}}{a_{51}}}&amp;{{a_{55}}{a_{52}}}&amp;{{a_{55}}{a_{53}}}&amp;{{a_{55}}{a_{54}}}&amp;{a_{55}^2} 
+\end{array}} \right] \hfill \\ 
+\end{gathered} \]</span></p>
+<div id="what-patterns-of-zeros-in-l-carry-over-to-v" class="section level3">
+<h3>What patterns of zeros in <span class="math">\(L\)</span> carry over to <span class="math">\(V\)</span>?</h3>
+<p>Conjecture:</p>
+<ol style="list-style-type: decimal">
+<li>Any pattern of zeros in which each column of zeros extends to the bottom row. Thus any subdiagonal rectangular block or a subdiagonal L-shape that extends to the bottom row will reproduce in the variance matrix.</li>
+<li>Two zeros (or blocks of zeros) in the first sub-diagonal (or first subdiagonal partition).</li>
+</ol>
+</div>
+<div id="models-for-categorical-factors" class="section level3">
+<h3>Models for categorical factors</h3>
+<p>Consider a random effects model with a 3-level categorical factor, <span class="math">\(F\)</span>, taking the values 0,1 and 2, and a continuous variable, <span class="math">\(x\)</span>. The random effect assuming independence between the random effect associated with <span class="math">\(F\)</span> and that associated with <span class="math">\(X\)</span>, can be written as:</p>
+<p><span class="math">\[
+\delta = u_0 + f_1 u_1 + f_2 u_2 + x u_3
+\]</span> where <span class="math">\(f_1 = I_{F=1}\)</span>, <span class="math">\(f_2 = I_{F=2}\)</span>, and</p>
+<p><span class="math">\[\operatorname{Var} \left( {\begin{array}{*{20}{c}}
+  {{u_0}} \\ 
+  {{u_1}} \\ 
+  {{u_3}} \\ 
+  {{u_4}} 
+\end{array}} \right) = \left[ {\begin{array}{*{20}{c}}
+  {{g_{00}}}&amp;{{g_{01}}}&amp;{{g_{02}}}&amp;{{g_{03}}} \\ 
+  {{g_{10}}}&amp;{{g_{11}}}&amp;{{g_{12}}}&amp;0 \\ 
+  {{g_{20}}}&amp;{{g_{21}}}&amp;{{g_{22}}}&amp;0 \\ 
+  {{g_{30}}}&amp;0&amp;0&amp;{{g_{33}}} 
+\end{array}} \right]\]</span></p>
+<p>Questions to explore are verifying the coding and location invariance of the model.</p>
+<p><span class="math">\[\begin{gathered}
+  \operatorname{var} (\delta |F = 0) = {g_{00}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
+  \operatorname{var} (\delta |F = 1) = {g_{00}} + 2{g_{01}} + {g_{11}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
+  \operatorname{var} (\delta |F = 2) = {g_{00}} + 2{g_{02}} + {g_{22}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
+  \operatorname{cov} (\delta |F = 0,\delta |F = 1) = {g_{00}} + {g_{01}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
+  \operatorname{cov} (\delta |F = 2,\delta |F = 1) = {g_{00}} + {g_{01}} + {g_{20}} + {g_{21}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\ 
+\end{gathered} \]</span></p>
+<p>From this we see the following variance properties for <span class="math">\(\delta\)</span>: <span class="math">\[\begin{gathered}
+  \operatorname{var} (\delta |F = 0) = {g_{00}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
+  \operatorname{var} (\delta |F = 1) = {g_{00}} + 2{g_{01}} + {g_{11}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
+  \operatorname{var} (\delta |F = 2) = {g_{00}} + 2{g_{02}} + {g_{22}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
+  \operatorname{cov} (\delta |F = 0,\delta |F = 1) = {g_{00}} + {g_{01}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
+  \operatorname{cov} (\delta |F = 1,\delta |F = 1) = {g_{00}} + {g_{01}} + {g_{20}} + {g_{21}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\ 
+\end{gathered} \]</span></p>
+</div>
+</div>
+<div id="variance-factorizations" class="section level2">
+<h2>Variance Factorizations</h2>
+<p>The Log-Cholesky factorization used for the variance-covariance matrix of random effects in <code>nlme</code> does not lend itself easily to selectively modeling some random effects as independent. This stems from the fact that the factorization is a ‘right’ factorization in which the variance matrix is expressed as: <span class="math">\[
+V = R'R
+\]</span> where <span class="math">\(R\)</span> is an upper-triangular (or ‘right-triangular’) matrix.</p>
+<p>Constraining off-diagonal upper-triangle elements of <span class="math">\(R\)</span> to be zero does not result in the corresponding element of <span class="math">\(V\)</span> being zero. That is, it does not result in a zero covariance. It produces, however, a zero conditional covariance.</p>
+<p><strong>TO DO:</strong> Demonstrate above.</p>
+<p>On the other hand, a left-triangular factorization: <span class="math">\[
+V = L'L
+\]</span> will have the property that 0 elements of <span class="math">\(L\)</span> in the lower triangle will result in 0 elements of <span class="math">\(V\)</span> in the corresponding position.</p>
+<p>The <code>chol</code> function in returns a right factorization. Note that the use of the <code>pivot</code> argument to handle rank-deficient matrices produces a factor that is not triangular if a non-trivial pivot is applied. As a result, pivotting cannot be used to handle singular variances since the assumption of triangular parametrization would be violated.</p>
+<pre class="sourceCode r"><code class="sourceCode r">(V &lt;-<span class="st"> </span><span class="kw">diag</span>(<span class="dv">1</span>:<span class="dv">3</span>) +<span class="st"> </span><span class="dv">1</span>)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    2    1    1
+## [2,]    1    3    1
+## [3,]    1    1    4</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">(f &lt;-<span class="st"> </span><span class="kw">chol</span>(V))</code></pre>
+<pre><code>##          [,1]      [,2]      [,3]
+## [1,] 1.414214 0.7071068 0.7071068
+## [2,] 0.000000 1.5811388 0.3162278
+## [3,] 0.000000 0.0000000 1.8439089</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">t</span>(f) %*%<span class="st"> </span>f</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    2    1    1
+## [2,]    1    3    1
+## [3,]    1    1    4</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">f[<span class="dv">2</span>,<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">0</span>
+f</code></pre>
+<pre><code>##          [,1]      [,2]      [,3]
+## [1,] 1.414214 0.7071068 0.7071068
+## [2,] 0.000000 1.5811388 0.0000000
+## [3,] 0.000000 0.0000000 1.8439089</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">(v2 &lt;-<span class="st"> </span><span class="kw">t</span>(f) %*%<span class="st"> </span>f)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    2  1.0  1.0
+## [2,]    1  3.0  0.5
+## [3,]    1  0.5  3.9</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># The conditional covariance is zero</span>
+v2[<span class="dv">2</span>:<span class="dv">3</span>,<span class="dv">2</span>:<span class="dv">3</span>] -<span class="st"> </span>
+<span class="st">  </span>v2[<span class="dv">2</span>:<span class="dv">3</span>,<span class="dv">1</span>,drop=<span class="ot">FALSE</span>] %*%<span class="st"> </span>
+<span class="st">    </span><span class="kw">solve</span>(v2[<span class="dv">1</span>,<span class="dv">1</span>],<span class="dt">drop=</span><span class="ot">FALSE</span>) %*%
+<span class="st">    </span>v2[<span class="dv">1</span>,<span class="dv">2</span>:<span class="dv">3</span>,drop=<span class="ot">FALSE</span>]</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]  2.5  0.0
+## [2,]  0.0  3.4</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># How to do a left-factorization</span>
+cholR &lt;-<span class="st"> </span>function(x, ...) {
+  <span class="co"># this can return a non-triangular factor, thus can't  be used for our purposes</span>
+  ret &lt;-<span class="st"> </span><span class="kw">chol</span>(x, <span class="dt">pivot =</span> <span class="ot">TRUE</span>)
+  pivot &lt;-<span class="st"> </span><span class="kw">attr</span>(ret, <span class="st">&quot;pivot&quot;</span>)
+  ret[, <span class="kw">order</span>(pivot)]
+  }
+
+cholL &lt;-<span class="st"> </span>function(x, ...) {
+  x[,] &lt;-<span class="st"> </span><span class="kw">rev</span>(x)
+  ret &lt;-<span class="st"> </span><span class="kw">chol</span>(x) <span class="co"># not cholR (see above)</span>
+  ret[,] &lt;-<span class="st"> </span><span class="kw">rev</span>(ret)
+  ret
+  }
+<span class="co"># test rank deficient V</span>
+V0 &lt;-<span class="st"> </span><span class="kw">crossprod</span>( <span class="kw">cbind</span>(<span class="dv">1</span>, <span class="dv">1</span>:<span class="dv">10</span>, (<span class="dv">1</span>:<span class="dv">10</span>)^<span class="dv">2</span>, <span class="dv">11</span>:<span class="dv">20</span>))
+<span class="kw">tryCatch</span>(<span class="kw">chol</span>(V0), <span class="dt">error =</span> function(e) e)</code></pre>
+<pre><code>## &lt;simpleError in chol.default(V0): the leading minor of order 4 is not positive definite&gt;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tryCatch</span>(<span class="kw">cholR</span>(V0), <span class="dt">error =</span> function(e) e)</code></pre>
+<pre><code>## Warning in chol.default(x, pivot = TRUE): the matrix is either rank-
+## deficient or indefinite</code></pre>
+<pre><code>##            [,1]      [,2]     [,3]     [,4]
+## [1,]  2.4188972 19.005621 159.1634 43.19459
+## [2,]  2.0300659  4.583615   0.0000 24.88427
+## [3,] -0.1666386  1.666386   0.0000  0.00000
+## [4,]  0.0000000  0.000000   0.0000  0.00000</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">lfac &lt;-<span class="st"> </span><span class="kw">cholL</span>(V)  
+<span class="kw">t</span>(lfac) %*%<span class="st"> </span>lfac</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    2    1    1
+## [2,]    1    3    1
+## [3,]    1    1    4</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">lfac[<span class="dv">3</span>,<span class="dv">2</span>] &lt;-<span class="st"> </span><span class="dv">0</span>
+<span class="kw">t</span>(lfac) %*%<span class="st"> </span>lfac</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,] 2.00 0.75    1
+## [2,] 0.75 2.75    0
+## [3,] 1.00 0.00    4</code></pre>
+<div id="is-there-an-efficient-way-to-turn-a-right-factor-into-a-left-factor" class="section level3">
+<h3>Is there an efficient way to turn a right factor into a left factor?</h3>
+<p>An inefficient, and probably numerically undesirable, way would construct the variance matrix and perform a left factorization: <code>cholL( t(R) %*% R)</code>.</p>
+<p>Instead, we use the <code>qr</code> decomposition of <code>R</code>, avoiding computing the variance matrix and the ensuing loss of precision.</p>
+<pre class="sourceCode r"><code class="sourceCode r">(lfac &lt;-<span class="st"> </span><span class="kw">cholL</span>(V))</code></pre>
+<pre><code>##          [,1]     [,2] [,3]
+## [1,] 1.243163 0.000000    0
+## [2,] 0.452267 1.658312    0
+## [3,] 0.500000 0.500000    2</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">rfac &lt;-<span class="st"> </span><span class="kw">qr.R</span>(<span class="kw">qr</span>(lfac))
+<span class="kw">chol</span>(V)</code></pre>
+<pre><code>##          [,1]      [,2]      [,3]
+## [1,] 1.414214 0.7071068 0.7071068
+## [2,] 0.000000 1.5811388 0.3162278
+## [3,] 0.000000 0.0000000 1.8439089</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">t</span>(rfac) %*%<span class="st"> </span>rfac -<span class="st"> </span>(<span class="kw">t</span>(lfac) %*%<span class="st"> </span>lfac)</code></pre>
+<pre><code>##               [,1]          [,2] [,3]
+## [1,] -2.220446e-16  0.000000e+00    0
+## [2,]  0.000000e+00 -4.440892e-16    0
+## [3,]  0.000000e+00  0.000000e+00    0</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">X &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dv">1</span>,<span class="dv">1</span>:<span class="dv">10</span>,(<span class="dv">1</span>:<span class="dv">10</span>)^<span class="dv">2</span>,<span class="dv">11</span>:<span class="dv">20</span>)
+<span class="kw">qr.R</span>(<span class="kw">qr</span>(X))</code></pre>
+<pre><code>##           [,1]       [,2]       [,3]          [,4]
+## [1,] -3.162278 -17.392527 -121.74769 -4.901530e+01
+## [2,]  0.000000   9.082951   99.91246  9.082951e+00
+## [3,]  0.000000   0.000000   22.97825 -2.763952e-15
+## [4,]  0.000000   0.000000    0.00000 -3.621805e-15</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">qr.R</span>(<span class="kw">qr</span>(X, <span class="dt">pivot =</span> T))</code></pre>
+<pre><code>##           [,1]       [,2]       [,3]          [,4]
+## [1,] -3.162278 -17.392527 -121.74769 -4.901530e+01
+## [2,]  0.000000   9.082951   99.91246  9.082951e+00
+## [3,]  0.000000   0.000000   22.97825 -2.763952e-15
+## [4,]  0.000000   0.000000    0.00000 -3.621805e-15</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">L2R &lt;-<span class="st"> </span>function(x, ...) {
+    R &lt;-<span class="st"> </span><span class="kw">qr.R</span>(<span class="kw">qr</span>(x))
+    <span class="kw">sign</span>(<span class="kw">diag</span>(R)) *<span class="st"> </span>R
+  }
+V</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    2    1    1
+## [2,]    1    3    1
+## [3,]    1    1    4</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cholL</span>(V) %&gt;%<span class="st"> </span><span class="kw">round</span>(<span class="dv">2</span>)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,] 1.24 0.00    0
+## [2,] 0.45 1.66    0
+## [3,] 0.50 0.50    2</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">V -<span class="st"> </span><span class="kw">crossprod</span>( <span class="kw">cholL</span>(V))</code></pre>
+<pre><code>##              [,1] [,2] [,3]
+## [1,] 2.220446e-16    0    0
+## [2,] 0.000000e+00    0    0
+## [3,] 0.000000e+00    0    0</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">V -<span class="st"> </span><span class="kw">crossprod</span>( <span class="kw">chol</span>(V))</code></pre>
+<pre><code>##               [,1]          [,2] [,3]
+## [1,] -4.440892e-16  0.000000e+00    0
+## [2,]  0.000000e+00 -4.440892e-16    0
+## [3,]  0.000000e+00  0.000000e+00    0</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">V -<span class="st"> </span><span class="kw">crossprod</span>( <span class="kw">L2R</span>(<span class="kw">cholL</span>(V)))</code></pre>
+<pre><code>##              [,1]         [,2] [,3]
+## [1,] 4.440892e-16 0.000000e+00    0
+## [2,] 0.000000e+00 4.440892e-16    0
+## [3,] 0.000000e+00 0.000000e+00    0</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">R2L &lt;-<span class="st"> </span>function(x, ...) {
+    x[] &lt;-<span class="st"> </span><span class="kw">rev</span>(x)
+    ret &lt;-<span class="st"> </span><span class="kw">L2R</span>(x, ...)
+    ret[] &lt;-<span class="st"> </span><span class="kw">rev</span>(ret)
+    ret
+  }
+x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">10000</span>), <span class="dv">100</span>)
+<span class="kw">system.time</span>(
+    for(i in <span class="dv">1</span>:<span class="dv">1000</span>) <span class="kw">R2L</span>(x)
+  )</code></pre>
+<pre><code>##    user  system elapsed 
+##    2.17    0.00    2.36</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(
+    for(i in <span class="dv">1</span>:<span class="dv">1000</span>) <span class="kw">L2R</span>(x)
+  )</code></pre>
+<pre><code>##    user  system elapsed 
+##    1.44    0.00    1.45</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Check that it works</span>
+
+V</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    2    1    1
+## [2,]    1    3    1
+## [3,]    1    1    4</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">Vr &lt;-<span class="st"> </span><span class="kw">crossprod</span>( <span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">9</span>),<span class="dv">3</span>))
+<span class="kw">svd</span>(Vr)$d</code></pre>
+<pre><code>## [1] 3.342857 2.170397 1.078817</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">lc &lt;-<span class="st"> </span><span class="kw">cholL</span>(Vr)
+Vr -<span class="st"> </span><span class="kw">crossprod</span>(lc)</code></pre>
+<pre><code>##              [,1] [,2] [,3]
+## [1,] 4.440892e-16    0    0
+## [2,] 0.000000e+00    0    0
+## [3,] 0.000000e+00    0    0</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">rc &lt;-<span class="st"> </span><span class="kw">chol</span>(Vr)
+Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc)</code></pre>
+<pre><code>##      [,1] [,2]         [,3]
+## [1,]    0    0 0.000000e+00
+## [2,]    0    0 0.000000e+00
+## [3,]    0    0 2.220446e-16</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">lc2r &lt;-<span class="st"> </span><span class="kw">L2R</span>(lc)
+Vr -<span class="st"> </span><span class="kw">crossprod</span>(lc2r)</code></pre>
+<pre><code>##      [,1] [,2]         [,3]
+## [1,]    0    0 0.000000e+00
+## [2,]    0    0 0.000000e+00
+## [3,]    0    0 2.220446e-16</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">rc2l &lt;-<span class="st"> </span><span class="kw">R2L</span>(rc)
+Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc2l)</code></pre>
+<pre><code>##              [,1] [,2] [,3]
+## [1,] 4.440892e-16    0    0
+## [2,] 0.000000e+00    0    0
+## [3,] 0.000000e+00    0    0</code></pre>
+</div>
+</div>
+<div id="creating-a-pdclass-based-on-pdlogchol" class="section level2">
+<h2>Creating a pdClass based on pdLogChol</h2>
+<p>Seems that:</p>
+<ul>
+<li>we need pdFactor.pdInd which is called by pdMatrix etc.</li>
+<li>we need solve.pdInd which returns the ‘pdInd’ object of the inverse (we can take advantage of a few things here)</li>
+<li>we might not need coef.pdInd since coef.pdMat would work, but perhaps might as well</li>
+<li>we need, of course, pdInd and, I’m pretty sure, pdConstruct.pdInd</li>
+</ul>
+<p>Note the following:</p>
+<ul>
+<li>solve.pdInd does not construct an inverse, just the pdInd representation of the inverse.</li>
+<li>So, where is the inverse right-factor constructed – which I assume is needed for the ML? Perhaps pdFactor, which is exported by nlme.</li>
+<li>The C function <code>logChol_pd</code> in <code>pdFactor.pdLogChol</code> returns a list of three components:</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>The R factor as a vector, listed column by column</li>
+<li>The number of rows in R, as a single number</li>
+<li>The logChol coeficients: log of diagonal elements of R followed by off-diagonal elements</li>
+</ol>
+<ul>
+<li>A call to pdMatrix for a pdLogChol/pdSymm/pdMat object calls the ‘pdMatrix.pdSymm’ method that in turn calls ‘pdFactor’ if the argument ‘factor’ is TRUE. Otherwise, it calls pdMatrix.pdMat that calls <code>crossprod(pdMatrix(object,factor=TRUE))</code></li>
+<li>So, bottom line, <code>pdFactor</code> is the critical method and we need a <code>pdFactor.pdInd</code>.</li>
+</ul>
+</div>
+<div id="solve.pdind" class="section level2">
+<h2>solve.pdInd</h2>
+<p>The solve method transforms a pdInd object representing a variance matrix to a pdInd object representing the inverse of that matrix. If we let <span class="math">\(L\)</span> be a left-triangular factorization of <span class="math">\(V = L'L\)</span> then, if <span class="math">\(F\)</span> is the left-triangular factorization of <span class="math">\(V^{-1}\)</span>, we have that $ F = R’^{-1}$ where <span class="math">\(R\)</span> is the right-triangular factor such that <span class="math">\(V = R'R\)</span>.</p>
+<p>Thus, <code>solve.pdInd</code> would transform <span class="math">\(L\)</span> to <span class="math">\(R'^{-1}\)</span>.</p>
+<p>To take advantage of the structure of a <code>pdInd</code> object, which is a factorization of a variance <span class="math">\(V\)</span> of the form:</p>
+<p><span class="math">\[V = \left[ {\begin{array}{*{20}{c}}
+  A&amp;{B'} \\ 
+  B&amp;C 
+\end{array}} \right]\]</span></p>
+<p>where <span class="math">\(C\)</span> is diagonal. In this case, <span class="math">\(L\)</span> has the form:</p>
+<p><span class="math">\[L = \left[ {\begin{array}{*{20}{c}}
+  D&amp;0 \\ 
+  E&amp;F 
+\end{array}} \right]\]</span></p>
+<p>conformably with the partitioning of <span class="math">\(V\)</span> with <span class="math">\(F\)</span> a diagonal matrix.</p>
+<p>Now an important problem, in contrast with existing methods for pdMat objects, is that the left-triangular factor of the inverse cannot be expressed with the unconstrained parametrization for <span class="math">\(V\)</span>.</p>
+<p>If the result of <code>solve</code> is only used through <code>pdFactor</code> or <code>pdMatrix</code>, then it is a simple thing to set a flag for the <code>pdInd</code> object indicating that it represents the inverse. We can give <code>pdFactor</code> and <code>pdMatrix</code> the job of computing the correct right-triangular factor.</p>
+<p>If the object created by <code>solve.pdInd</code> is used in other ways then the problem might be more difficult.</p>
+<p>One hopes that the approach of using <code>solve</code> to create the representation of <span class="math">\(V^{-1}\)</span> arose simply from the fact that the <code>pdMat</code> classes in the original version of <code>nlme</code> all lent themselves to this approach.</p>
+<p>Here are some relevant expressions:</p>
+<p><span class="math">\[\begin{gathered}
+  V = \left[ {\begin{array}{*{20}{c}}
+  A&amp;{B'} \\ 
+  B&amp;C 
+\end{array}} \right] \hfill \\
+  L = \left[ {\begin{array}{*{20}{c}}
+  D&amp;0 \\ 
+  E&amp;F 
+\end{array}} \right] \hfill \\ 
+\end{gathered} \]</span></p>
+<p><span class="math">\[\left[ {\begin{array}{*{20}{c}}
+  A&amp;{B'} \\ 
+  B&amp;C 
+\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+  {D'}&amp;{E'} \\ 
+  0&amp;F 
+\end{array}} \right]\left[ {\begin{array}{*{20}{c}}
+  D&amp;0 \\ 
+  E&amp;F 
+\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+  {D'D + E'E}&amp;{E'F} \\ 
+  {FE}&amp;{{F^2}} 
+\end{array}} \right]\]</span></p>
+<p><span class="math">\[F = {C^{1/2}}\]</span></p>
+<p><span class="math">\[E = {F^{ - 1}}E\]</span></p>
+<p><span class="math">\[D'D = A - E'E\]</span></p>
+<p><span class="math">\[R = \left[ {\begin{array}{*{20}{c}}
+  G&amp;H \\ 
+  0&amp;K 
+\end{array}} \right]\]</span></p>
+<p><span class="math">\[V = R'R = \left[ {\begin{array}{*{20}{c}}
+  A&amp;{B'} \\ 
+  B&amp;C 
+\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+  {G'}&amp;0 \\ 
+  {H'}&amp;{K'} 
+\end{array}} \right]\left[ {\begin{array}{*{20}{c}}
+  G&amp;H \\ 
+  0&amp;K 
+\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+  {G'G}&amp;{G'H} \\ 
+  {H'G}&amp;{H'H + K'K} 
+\end{array}} \right]\]</span></p>
+<p>The problem arises from the fact that, in the case of the right-triangular factorization, the diagonality of <span class="math">\(C\)</span> does not imply the diagonality of <span class="math">\(K\)</span>, which is precisely why we need to use the left-triangular factorization in the first place.</p>
+<p>Thus, when we invert and transpose <span class="math">\(R\)</span> to get the left-triangular factor of <span class="math">\(V^{-1}\)</span> we cannont use the parsimonious unrestricted parametrization of the <code>pdInd</code> object.</p>
+<p>To get around this, we will attempt to use the following strategy:</p>
+<ol style="list-style-type: decimal">
+<li>Add an ‘invert’ attribute to ‘pdInd’ object. Intially, it is set to FALSE.</li>
+<li><code>solve.pdInd</code> simply inverts the flag (from FALSE to TRUE or TRUE to FALSE).</li>
+<li><code>pdFactor.pdInd</code> returns a right-triangular factor for <span class="math">\(V\)</span> or for <span class="math">\(V^{-1}\)</span> depending on the value of the ‘invert’ attribute.</li>
+</ol>
+<p>Thus the burden of dealing with inversion is passed along to <code>pdFactor.pdInd</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(nlme)
+<span class="kw">methods</span>(<span class="dt">class=</span><span class="st">&quot;pdLogChol&quot;</span>)</code></pre>
+<pre><code>## [1] pdConstruct.pdLogChol* pdFactor.pdLogChol*    solve.pdLogChol*      
+## [4] summary.pdLogChol*    
+## 
+##    Non-visible functions are asterisked</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">methods</span>(<span class="dt">class=</span><span class="st">&quot;pdSymm&quot;</span>)</code></pre>
+<pre><code>## [1] coef.pdSymm*        Dim.pdSymm*         logDet.pdSymm*     
+## [4] pdConstruct.pdSymm* pdFactor.pdSymm*    pdMatrix.pdSymm*   
+## [7] solve.pdSymm*       summary.pdSymm*    
+## 
+##    Non-visible functions are asterisked</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">nlme:::coef.pdSymm</code></pre>
+<pre><code>## function (object, unconstrained = TRUE, ...) 
+## {
+##     if (unconstrained || !isInitialized(object)) 
+##         NextMethod()
+##     else {
+##         val &lt;- as.matrix(object)
+##         aN &lt;- Names(object)
+##         aN1 &lt;- paste(&quot;cov(&quot;, aN, sep = &quot;&quot;)
+##         aN2 &lt;- paste(aN, &quot;)&quot;, sep = &quot;&quot;)
+##         aNmat &lt;- t(outer(aN1, aN2, paste, sep = &quot;,&quot;))
+##         aNmat[row(aNmat) == col(aNmat)] &lt;- paste(&quot;var(&quot;, aN, 
+##             &quot;)&quot;, sep = &quot;&quot;)
+##         val &lt;- val[row(val) &lt;= col(val)]
+##         names(val) &lt;- aNmat[row(aNmat) &lt;= col(aNmat)]
+##         val
+##     }
+## }
+## &lt;bytecode: 0x000000001e9240f8&gt;
+## &lt;environment: namespace:nlme&gt;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">methods</span>(<span class="dt">class=</span><span class="st">&quot;pdMat&quot;</span>)</code></pre>
+<pre><code>##  [1] [.pdMat*             [&lt;-.pdMat*           as.matrix.pdMat*    
+##  [4] coef.pdMat*          coef&lt;-.pdMat*        corMatrix.pdMat*    
+##  [7] Dim.pdMat*           formula.pdMat*       isInitialized.pdMat*
+## [10] logDet.pdMat*        matrix&lt;-.pdMat*      Names.pdMat*        
+## [13] Names&lt;-.pdMat*       pdConstruct.pdMat*   pdFactor.pdMat*     
+## [16] pdMatrix.pdMat*      plot.pdMat*          print.pdMat*        
+## [19] solve.pdMat*         summary.pdMat*       VarCorr.pdMat*      
+## 
+##    Non-visible functions are asterisked</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">nlme:::pdLogChol</code></pre>
+<pre><code>## function (value = numeric(0), form = NULL, nam = NULL, data = sys.parent()) 
+## {
+##     object &lt;- numeric(0)
+##     class(object) &lt;- c(&quot;pdLogChol&quot;, &quot;pdMat&quot;)
+##     pdConstruct(object, value, form, nam, data)
+## }
+## &lt;bytecode: 0x0000000013b198e8&gt;
+## &lt;environment: namespace:nlme&gt;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">nlme:::pdSymm</code></pre>
+<pre><code>## function (value = numeric(0), form = NULL, nam = NULL, data = parent.frame()) 
+## {
+##     object &lt;- numeric(0)
+##     class(object) &lt;- c(&quot;pdSymm&quot;, &quot;pdMat&quot;)
+##     pdConstruct(object, value, form, nam, data)
+## }
+## &lt;bytecode: 0x0000000013a586f0&gt;
+## &lt;environment: namespace:nlme&gt;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">nlme:::pdMat</code></pre>
+<pre><code>## function (value = numeric(0), form = NULL, nam = NULL, data = sys.frame(sys.parent()), 
+##     pdClass = &quot;pdSymm&quot;) 
+## {
+##     if (inherits(value, &quot;pdMat&quot;)) {
+##         pdClass &lt;- class(value)
+##     }
+##     object &lt;- numeric(0)
+##     class(object) &lt;- unique(c(pdClass, &quot;pdMat&quot;))
+##     pdConstruct(object, value, form, nam, data)
+## }
+## &lt;bytecode: 0x00000000137ad180&gt;
+## &lt;environment: namespace:nlme&gt;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">pdFactorfull &lt;-<span class="st"> </span>function (object) 
+{
+    Ncol &lt;-<span class="st"> </span><span class="kw">round</span>((-<span class="dv">1</span> +<span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">1</span> +<span class="st"> </span><span class="dv">8</span> *<span class="st"> </span><span class="kw">length</span>(object)))/<span class="dv">2</span>)
+    <span class="kw">.C</span>(logChol_pd, <span class="dt">Factor =</span> <span class="kw">double</span>(Ncol *<span class="st"> </span>Ncol), <span class="kw">as.integer</span>(Ncol), 
+        <span class="kw">as.double</span>(object))
+}
+<span class="kw">environment</span>(pdFactorfull) &lt;-<span class="st"> </span><span class="kw">environment</span>(pdFactor)</code></pre>
+</div>
+<div id="examples" class="section level2">
+<h2>Examples</h2>
+<p>Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The <code>html_vignette</code> output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The <code>html_vignette</code> format:</p>
+<ul>
+<li>Never uses retina figures</li>
+<li>Has a smaller default figure size</li>
+<li>Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style</li>
+</ul>
+</div>
+<div id="vignette-info" class="section level2">
+<h2>Vignette Info</h2>
+<p>Note the various macros within the <code>vignette</code> setion of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the <code>title</code> field and the <code>\VignetteIndexEntry</code> to match the title of your vignette.</p>
+</div>
+<div id="styles" class="section level2">
+<h2>Styles</h2>
+<p>The <code>html_vignette</code> template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:</p>
+<pre><code>output: 
+  rmarkdown::html_vignette:
+    css: mystyles.css</code></pre>
+</div>
+<div id="figures" class="section level2">
+<h2>Figures</h2>
+<p>The figure sizes have been customised so that you can easily put two images side-by-side.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(<span class="dv">1</span>:<span class="dv">10</span>)
+<span class="kw">plot</span>(<span class="dv">10</span>:<span class="dv">1</span>)</code></pre>
+<p><img src="data:image/png;base64,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" /> <img src="data:image/png;base64,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" /></p>
+<p>You can enable figure captions by <code>fig_caption: yes</code> in YAML:</p>
+<pre><code>output:
+  rmarkdown::html_vignette:
+    fig_caption: yes</code></pre>
+<p>Then you can use the chunk option <code>fig.cap = &quot;Your figure caption.&quot;</code> in <strong>knitr</strong>.</p>
+</div>
+<div id="more-examples" class="section level2">
+<h2>More Examples</h2>
+<p>You can write math expressions, e.g. <span class="math">\(Y = X\beta + \epsilon\)</span>, footnotes<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>, and tables, e.g. using <code>knitr::kable()</code>.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">mpg</th>
+<th align="right">cyl</th>
+<th align="right">disp</th>
+<th align="right">hp</th>
+<th align="right">drat</th>
+<th align="right">wt</th>
+<th align="right">qsec</th>
+<th align="right">vs</th>
+<th align="right">am</th>
+<th align="right">gear</th>
+<th align="right">carb</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Mazda RX4</td>
+<td align="right">21.0</td>
+<td align="right">6</td>
+<td align="right">160.0</td>
+<td align="right">110</td>
+<td align="right">3.90</td>
+<td align="right">2.620</td>
+<td align="right">16.46</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">Mazda RX4 Wag</td>
+<td align="right">21.0</td>
+<td align="right">6</td>
+<td align="right">160.0</td>
+<td align="right">110</td>
+<td align="right">3.90</td>
+<td align="right">2.875</td>
+<td align="right">17.02</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">Datsun 710</td>
+<td align="right">22.8</td>
+<td align="right">4</td>
+<td align="right">108.0</td>
+<td align="right">93</td>
+<td align="right">3.85</td>
+<td align="right">2.320</td>
+<td align="right">18.61</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Hornet 4 Drive</td>
+<td align="right">21.4</td>
+<td align="right">6</td>
+<td align="right">258.0</td>
+<td align="right">110</td>
+<td align="right">3.08</td>
+<td align="right">3.215</td>
+<td align="right">19.44</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Hornet Sportabout</td>
+<td align="right">18.7</td>
+<td align="right">8</td>
+<td align="right">360.0</td>
+<td align="right">175</td>
+<td align="right">3.15</td>
+<td align="right">3.440</td>
+<td align="right">17.02</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">Valiant</td>
+<td align="right">18.1</td>
+<td align="right">6</td>
+<td align="right">225.0</td>
+<td align="right">105</td>
+<td align="right">2.76</td>
+<td align="right">3.460</td>
+<td align="right">20.22</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Duster 360</td>
+<td align="right">14.3</td>
+<td align="right">8</td>
+<td align="right">360.0</td>
+<td align="right">245</td>
+<td align="right">3.21</td>
+<td align="right">3.570</td>
+<td align="right">15.84</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">Merc 240D</td>
+<td align="right">24.4</td>
+<td align="right">4</td>
+<td align="right">146.7</td>
+<td align="right">62</td>
+<td align="right">3.69</td>
+<td align="right">3.190</td>
+<td align="right">20.00</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">Merc 230</td>
+<td align="right">22.8</td>
+<td align="right">4</td>
+<td align="right">140.8</td>
+<td align="right">95</td>
+<td align="right">3.92</td>
+<td align="right">3.150</td>
+<td align="right">22.90</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">Merc 280</td>
+<td align="right">19.2</td>
+<td align="right">6</td>
+<td align="right">167.6</td>
+<td align="right">123</td>
+<td align="right">3.92</td>
+<td align="right">3.440</td>
+<td align="right">18.30</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="right">4</td>
+</tr>
+</tbody>
+</table>
+<p>Also a quote using <code>&gt;</code>:</p>
+<blockquote>
+<p>“He who gives up [code] safety for [code] speed deserves neither.” (<a href="https://twitter.com/hadleywickham/status/504368538874703872">via</a>)</p>
+</blockquote>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>A footnote here.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
