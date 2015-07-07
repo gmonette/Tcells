@@ -30,8 +30,7 @@ time $t$ and time $t+1$,
 2. $X_t^t$ represents the number of cells of type $X$ that transition to the next type,
 3. $B_t$ represents the number of new cells of type $N$.
 
-Letting $d_t = \tau_{t+1} - \tau_t$ be the number of units of time elapsed between the the observation at time $\tau_t$ and that at time $\tau_{t+1}$, the 
-hypothetical distribution of each component is: 
+Letting $d_t = \tau_{t+1} - \tau_t$ be the number of units of time elapsed between the observations at times $\tau_t$ and $\tau_{t+1}$, the hypothetical distribution of each component is: 
 
 \[\begin{aligned}
   {B_t}\sim & Poisson(\lambda d_t) \\
@@ -46,29 +45,29 @@ hypothetical distribution of each component is:
   E_t^d\sim & Poisson\left( {{E_t}{\delta _E} d_t} \right)  \\
 \end{aligned} \]
 
-where $\lambda$ represents the expected number of new cells of type $N$ per unit of time and the 9 parameters of the form $\delta_X, \psi_X$, represent 
-the probability of death or transition per cell per unit of time. If $d_t$
-is close to constant, it can be be omitted in the model.
+This model has ten parameters: $\lambda$ representing the expected number of new cells of type $N$ per unit of time, and nine parameters of the form $\delta_X, \psi_X$, representing 
+the probability of death or transition per cell per unit of time.
 
-This model should be accurate if the number of dying and transitioning cells of
+If $d_t$ is almost constant, it can be be omitted in the model. For simplicity, it is omitted in the following formulas.
+
+The values of some or all of these parameters are expected to 
+vary from subject to subject. Using a mixed model in 
+which the parameters are
+random allows this feature to be include in modeling.
+
+The model should be accurate if the number of dying and 
+transitioning cells of
 each type is relatively small compared with the total number of cells of 
-that type within each observed time period. In this case, it may be reasonable to assume that the $B_t, N_t^d, N_t^t, ...$ components are independent within occasion $t$ and sequentially conditionally independent, i.e. the distribution of $B_t |N_t$ is independent of the distribution of $B_{t+1}|N_{t+1}$, etc.
+that type within each observed time period. In this case, it may also be reasonable to assume that the $B_t, N_t^d, N_t^t, ...$ components are independent within occasion $t$ and sequentially conditionally independent, i.e. the distribution of $B_t |N_t$ is independent of the distribution of $B_{t+1}|N_{t+1}$, etc.
 
 The change in cell counts between occasions is:
-
 \[\Delta \left[ {\begin{array}{*{20}{c}}
   {{N_{t + 1}}} \\ 
   {{S_{t + 1}}} \\ 
   {{C_{t + 1}}} \\ 
   {{T_{t + 1}}} \\ 
   {{E_{t + 1}}} 
-\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
-  1&{ - 1}&{ - 1}&0&0&0&0&0&0&0 \\ 
-  0&0&1&{ - 1}&{ - 1}&0&0&0&0&0 \\ 
-  0&0&0&0&1&{ - 1}&{ - 1}&0&0&0 \\ 
-  0&0&0&0&0&0&1&{ - 1}&{ - 1}&0 \\ 
-  0&0&0&0&0&0&0&0&1&{ - 1} 
-\end{array}} \right]\left[ {\begin{array}{*{20}{c}}
+\end{array}} \right] = A \left[ {\begin{array}{*{20}{c}}
   {{B_t}} \\ 
   {N_t^d} \\ 
   {N_t^t} \\ 
@@ -80,17 +79,7 @@ The change in cell counts between occasions is:
   {T_t^t} \\ 
   {E_t^d} 
 \end{array}} \right]\]
-
-\[\operatorname{Var} \left( {\Delta \left[ {\begin{array}{*{20}{c}}
-  {{N_{t + 1}}} \\ 
-  {{S_{t + 1}}} \\ 
-  {{C_{t + 1}}} \\ 
-  {{T_{t + 1}}} \\ 
-  {{E_{t + 1}}} 
-\end{array}} \right]} \right) = A\left[ {diag\left( {\begin{array}{*{20}{c}}
-  \lambda &{{\delta _N}{N_t}}&{{\psi _N}{N_t}}&{{\delta _S}{S_t}}&{{\psi _S}{S_t}}&{{\delta _C}{C_t}}&{{\psi _C}{C_t}}&{{\delta _T}{T_t}}&{{\psi _T}{T_t}}&{{\delta _E}{E_t}} 
-\end{array}} \right)} \right]A'\]
-
+where
 \[A = \left[ {\begin{array}{*{20}{c}}
   1&{ - 1}&{ - 1}&0&0&0&0&0&0&0 \\ 
   0&0&1&{ - 1}&{ - 1}&0&0&0&0&0 \\ 
@@ -98,23 +87,7 @@ The change in cell counts between occasions is:
   0&0&0&0&0&0&1&{ - 1}&{ - 1}&0 \\ 
   0&0&0&0&0&0&0&0&1&{ - 1} 
 \end{array}} \right]\]
-
-\[\left[ {\begin{array}{*{20}{c}}
-  {\lambda  + {N_t}\left( {{\delta _N} + {\psi _N}} \right)}&{ - {\psi _N}{N_t}}&0&0&0 \\ 
-  { - {\psi _N}{N_t}}&{{\psi _N}{N_t} + {S_t}\left( {{\delta _S} + {\psi _S}} \right)}&{ - {\psi _S}{S_t}}&0&0 \\ 
-  0&{ - {\psi _S}{S_t}}&{{\psi _S}{S_t} + {C_t}\left( {{\delta _C} + {\psi _C}} \right)}&{ - {\psi _C}{C_t}}&0 \\ 
-  0&0&{ - {\psi _C}{C_t}}&{{\psi _C}{C_t} + {T_t}\left( {{\delta _T} + {\psi _T}} \right)}&{ - {\psi _T}{T_t}} \\ 
-  0&0&0&{ - {\psi _T}{T_t}}&{{\psi _T}{T_t} + {\delta _E}{E_t}} 
-\end{array}} \right]\]
-
-\[\left[ {\begin{array}{*{20}{c}}
-  {\lambda  + {N_t}{\phi _N}}&{ - {\psi _N}{N_t}}&0&0&0 \\ 
-  { - {\psi _N}{N_t}}&{{\psi _N}{N_t} + {S_t}{\phi _S}}&{ - {\psi _S}{S_t}}&0&0 \\ 
-  0&{ - {\psi _S}{S_t}}&{{\psi _S}{S_t} + {C_t}{\phi _C}}&{ - {\psi _C}{C_t}}&0 \\ 
-  0&0&{ - {\psi _C}{C_t}}&{{\psi _C}{C_t} + {T_t}{\phi _T}}&{ - {\psi _T}{T_t}} \\ 
-  0&0&0&{ - {\psi _T}{T_t}}&{{\psi _T}{T_t} + {E_t}{\phi _E}} 
-\end{array}} \right]\]
-
+The expectation of the change in cell counts is: 
 \[E\left( {\Delta \left[ {\begin{array}{*{20}{c}}
   {{N_{t + 1}}} \\ 
   {{S_{t + 1}}} \\ 
@@ -133,60 +106,63 @@ The change in cell counts between occasions is:
   {{\psi _S}{S_t} - {C_t}\left( {{\delta _C} + {\psi _C}} \right)} \\ 
   {{\psi _C}{C_t} - {T_t}\left( {{\delta _T} + {\psi _T}} \right)} \\ 
   {{\psi _T}{T_t} - {\delta _E}{E_t}} 
-\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
-  {\lambda  - {N_t}{\phi _N}} \\ 
-  {{\psi _N}{N_t} - {S_t}{\phi _S}} \\ 
-  {{\psi _S}{S_t} - {C_t}{\phi _C}} \\ 
-  {{\psi _C}{C_t} - {T_t}{\phi _T}} \\ 
-  {{\psi _T}{T_t} - {E_t}{\phi _E}} 
+\end{array}} \right] 
+\]
+and the variance-covariance matrix is
+\[\operatorname{Var} \left( {\Delta \left[ {\begin{array}{*{20}{c}}
+  {{N_{t + 1}}} \\ 
+  {{S_{t + 1}}} \\ 
+  {{C_{t + 1}}} \\ 
+  {{T_{t + 1}}} \\ 
+  {{E_{t + 1}}} 
+\end{array}} \right]} \right) = A\left[ {diag\left( {\begin{array}{*{20}{c}}
+  \lambda &{{\delta _N}{N_t}}&{{\psi _N}{N_t}}&{{\delta _S}{S_t}}&{{\psi _S}{S_t}}&{{\delta _C}{C_t}}&{{\psi _C}{C_t}}&{{\delta _T}{T_t}}&{{\psi _T}{T_t}}&{{\delta _E}{E_t}} 
+\end{array}} \right)} \right]A'\]
+
+
+\[ = \left[ {\begin{array}{*{20}{c}}
+  {\lambda  + {N_t}\left( {{\delta _N} + {\psi _N}} \right)}&{ - {\psi _N}{N_t}}&0&0&0 \\ 
+  { - {\psi _N}{N_t}}&{{\psi _N}{N_t} + {S_t}\left( {{\delta _S} + {\psi _S}} \right)}&{ - {\psi _S}{S_t}}&0&0 \\ 
+  0&{ - {\psi _S}{S_t}}&{{\psi _S}{S_t} + {C_t}\left( {{\delta _C} + {\psi _C}} \right)}&{ - {\psi _C}{C_t}}&0 \\ 
+  0&0&{ - {\psi _C}{C_t}}&{{\psi _C}{C_t} + {T_t}\left( {{\delta _T} + {\psi _T}} \right)}&{ - {\psi _T}{T_t}} \\ 
+  0&0&0&{ - {\psi _T}{T_t}}&{{\psi _T}{T_t} + {\delta _E}{E_t}} 
 \end{array}} \right]\]
 
+This formulation of the model allows an unconstrained parametrization by using the log of each parameter, each of which is positive, as the actual working parameter for optimization.
 
-== Notes on vignettes ==
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+## Using mixed models
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+In most applications of mixed models, there is a univariate response variable whose expectation is determined by a linear model some of whose coefficients are fixed unknown parameters and others vary randomly from cluster to cluster. The model for the variance of the random parameters can be selected from a limited number of 
+possibilies. Within each cluster, responses are independent with the same conditional within cluster variance for all observations.
 
-## Vignette Info
+This application is particularly interesting in that none of these
+common assumptions are reasonable.
 
-Note the various macros within the `vignette` setion of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+The response is multivariate (the five cell types) and the variance is different at each occasion depending on parameters of the 
+expectation model.
 
-## Styles
+Few packages have the flexibility to accomodate these issues.
+The 'nlme' package has facilities to deal with:
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+1. Different models for the variance of random parameters: However it does not include models that would be reasonable for this kind of problem. A full free variance model would have too many parameters so that some independence assumptions are necessary. However, the only such model readily available in 'nlme' forces
+independence from the intercept random effect which imposes a very
+unrealistic assumption on the model.
+2. Variances that vary depending on a fixed covariate or on the expected value of the response: However, there is no provision for variance that depends in a complex way on parameters of the linear model that
+are estimated iteratively in fitting the model.
+3. Correlations between responses: However, again, there is no provision for correlations that depend on linear parameters nor
+for the type of correlation pattern in this problem.
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
+The virtue of 'nlme' is that its source is open and it is possible to create new 'methods' to implement models for the random parameter variance, the conditional response variance and the within-occasion response covariances that occur in this model.
 
-## Figures
+The first part, which was more 'theoretically' challenging is complete.  The other two parts are well under way.
 
-The figure sizes have been customised so that you can easily put two images side-by-side. 
+The software to implement this is being built in a R package called 'Tcells' on github. It can be installed in R with the following commands:
 
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+```
+install.packages('devtools')
+library(devtools)
+install_github('gmonette/Tcells')
+library(Tcells)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+Since package is being developed it is good practice to reinstall it frequently.
