@@ -1,0 +1,192 @@
+---
+title: "T-cell dynamics"
+author: "GM + ?"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+## Using mixed models to fit T-cell dynamic models
+
+Subjects are observed at a number of occasions at different times. On each occasion the densities of cells of five different types are recorded.
+
+The process for these five types, $N, S, C, T$ and $E$, are modelled as follows:
+
+\[\begin{aligned}
+  {N_{t + 1}} =  & {N_t} + {B_t} - N_t^d - N_t^t \\ 
+  {S_{t + 1}} =  & {S_t} + N_t^t - S_t^d - S_t^t \\ 
+  {C_{t + 1}} =  & {C_t} + S_t^t - C_t^d - C_t^t \\ 
+  {T_{t + 1}} =  & {T_t} + C_t^t - T_t^d - T_t^t \\ 
+  {E_{t + 1}} =  & {E_t} + T_t^t - E_t^d \\ 
+\end{aligned} \]
+
+where 
+
+1. $X_t^d$ represents the number of cells of type $X$ that die between 
+time $t$ and time $t+1$,
+2. $X_t^t$ represents the number of cells of type $X$ that transition to the next type,
+3. $B_t$ represents the number of new cells of type $N$.
+
+Letting $d_t = \tau_{t+1} - \tau_t$ be the number of units of time elapsed between the the observation at time $\tau_t$ and that at time $\tau_{t+1}$, the 
+hypothetical distribution of each component is: 
+
+\[\begin{aligned}
+  {B_t}\sim & Poisson(\lambda d_t) \\
+  N_t^d\sim & Poisson\left( {{N_t}{\delta _N d_t}} \right)\\
+  N_t^t\sim & Poisson\left( {{N_t}{\psi _N} d_t} \right)\\
+  S_t^d\sim & Poisson\left( {{S_t}{\delta _S} d_t} \right) \\
+  S_t^t\sim & Poisson\left( {{S_t}{\psi _S} d_t} \right)  \\
+  C_t^d\sim & Poisson\left( {{C_t}{\delta _C} d_t} \right) \\
+  C_t^t\sim & Poisson\left( {{C_t}{\psi _C} d_t} \right) \\
+  T_t^d\sim & Poisson\left( {{T_t}{\delta _T} d_t} \right)\\
+  T_t^t\sim & Poisson\left( {{C_t}{\psi _T} d_t} \right) \\
+  E_t^d\sim & Poisson\left( {{E_t}{\delta _E} d_t} \right)  \\
+\end{aligned} \]
+
+where $\lambda$ represents the expected number of new cells of type $N$ per unit of time and the 9 parameters of the form $\delta_X, \psi_X$, represent 
+the probability of death or transition per cell per unit of time. If $d_t$
+is close to constant, it can be be omitted in the model.
+
+This model should be accurate if the number of dying and transitioning cells of
+each type is relatively small compared with the total number of cells of 
+that type within each observed time period. In this case, it may be reasonable to assume that the $B_t, N_t^d, N_t^t, ...$ components are independent within occasion $t$ and sequentially conditionally independent, i.e. the distribution of $B_t |N_t$ is independent of the distribution of $B_{t+1}|N_{t+1}$, etc.
+
+The change in cell counts between occasions is:
+
+\[\Delta \left[ {\begin{array}{*{20}{c}}
+  {{N_{t + 1}}} \\ 
+  {{S_{t + 1}}} \\ 
+  {{C_{t + 1}}} \\ 
+  {{T_{t + 1}}} \\ 
+  {{E_{t + 1}}} 
+\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+  1&{ - 1}&{ - 1}&0&0&0&0&0&0&0 \\ 
+  0&0&1&{ - 1}&{ - 1}&0&0&0&0&0 \\ 
+  0&0&0&0&1&{ - 1}&{ - 1}&0&0&0 \\ 
+  0&0&0&0&0&0&1&{ - 1}&{ - 1}&0 \\ 
+  0&0&0&0&0&0&0&0&1&{ - 1} 
+\end{array}} \right]\left[ {\begin{array}{*{20}{c}}
+  {{B_t}} \\ 
+  {N_t^d} \\ 
+  {N_t^t} \\ 
+  {S_t^d} \\ 
+  {S_t^t} \\ 
+  {C_t^d} \\ 
+  {C_t^t} \\ 
+  {T_t^d} \\ 
+  {T_t^t} \\ 
+  {E_t^d} 
+\end{array}} \right]\]
+
+\[\operatorname{Var} \left( {\Delta \left[ {\begin{array}{*{20}{c}}
+  {{N_{t + 1}}} \\ 
+  {{S_{t + 1}}} \\ 
+  {{C_{t + 1}}} \\ 
+  {{T_{t + 1}}} \\ 
+  {{E_{t + 1}}} 
+\end{array}} \right]} \right) = A\left[ {diag\left( {\begin{array}{*{20}{c}}
+  \lambda &{{\delta _N}{N_t}}&{{\psi _N}{N_t}}&{{\delta _S}{S_t}}&{{\psi _S}{S_t}}&{{\delta _C}{C_t}}&{{\psi _C}{C_t}}&{{\delta _T}{T_t}}&{{\psi _T}{T_t}}&{{\delta _E}{E_t}} 
+\end{array}} \right)} \right]A'\]
+
+\[A = \left[ {\begin{array}{*{20}{c}}
+  1&{ - 1}&{ - 1}&0&0&0&0&0&0&0 \\ 
+  0&0&1&{ - 1}&{ - 1}&0&0&0&0&0 \\ 
+  0&0&0&0&1&{ - 1}&{ - 1}&0&0&0 \\ 
+  0&0&0&0&0&0&1&{ - 1}&{ - 1}&0 \\ 
+  0&0&0&0&0&0&0&0&1&{ - 1} 
+\end{array}} \right]\]
+
+\[\left[ {\begin{array}{*{20}{c}}
+  {\lambda  + {N_t}\left( {{\delta _N} + {\psi _N}} \right)}&{ - {\psi _N}{N_t}}&0&0&0 \\ 
+  { - {\psi _N}{N_t}}&{{\psi _N}{N_t} + {S_t}\left( {{\delta _S} + {\psi _S}} \right)}&{ - {\psi _S}{S_t}}&0&0 \\ 
+  0&{ - {\psi _S}{S_t}}&{{\psi _S}{S_t} + {C_t}\left( {{\delta _C} + {\psi _C}} \right)}&{ - {\psi _C}{C_t}}&0 \\ 
+  0&0&{ - {\psi _C}{C_t}}&{{\psi _C}{C_t} + {T_t}\left( {{\delta _T} + {\psi _T}} \right)}&{ - {\psi _T}{T_t}} \\ 
+  0&0&0&{ - {\psi _T}{T_t}}&{{\psi _T}{T_t} + {\delta _E}{E_t}} 
+\end{array}} \right]\]
+
+\[\left[ {\begin{array}{*{20}{c}}
+  {\lambda  + {N_t}{\phi _N}}&{ - {\psi _N}{N_t}}&0&0&0 \\ 
+  { - {\psi _N}{N_t}}&{{\psi _N}{N_t} + {S_t}{\phi _S}}&{ - {\psi _S}{S_t}}&0&0 \\ 
+  0&{ - {\psi _S}{S_t}}&{{\psi _S}{S_t} + {C_t}{\phi _C}}&{ - {\psi _C}{C_t}}&0 \\ 
+  0&0&{ - {\psi _C}{C_t}}&{{\psi _C}{C_t} + {T_t}{\phi _T}}&{ - {\psi _T}{T_t}} \\ 
+  0&0&0&{ - {\psi _T}{T_t}}&{{\psi _T}{T_t} + {E_t}{\phi _E}} 
+\end{array}} \right]\]
+
+\[E\left( {\Delta \left[ {\begin{array}{*{20}{c}}
+  {{N_{t + 1}}} \\ 
+  {{S_{t + 1}}} \\ 
+  {{C_{t + 1}}} \\ 
+  {{T_{t + 1}}} \\ 
+  {{E_{t + 1}}} 
+\end{array}} \right]} \right) = \left[ {\begin{array}{*{20}{c}}
+  {\lambda  - {\delta _N}{N_t} - {\psi _N}{N_t}} \\ 
+  {{\psi _N}{N_t} - {\delta _S}S - {\psi _S}{S_t}} \\ 
+  {{\psi _S}{S_t} - {\delta _C}{C_t} - {\psi _C}{C_t}} \\ 
+  {{\psi _C}{C_t} - {\delta _T}{T_t} - {\psi _T}{T_t}} \\ 
+  {{\psi _T}{T_t} - {\delta _E}{E_t}} 
+\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+  {\lambda  - {N_t}\left( {{\delta _N} + {\psi _N}} \right)} \\ 
+  {{\psi _N}{N_t} - {S_t}\left( {{\delta _S} + {\psi _S}} \right)} \\ 
+  {{\psi _S}{S_t} - {C_t}\left( {{\delta _C} + {\psi _C}} \right)} \\ 
+  {{\psi _C}{C_t} - {T_t}\left( {{\delta _T} + {\psi _T}} \right)} \\ 
+  {{\psi _T}{T_t} - {\delta _E}{E_t}} 
+\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+  {\lambda  - {N_t}{\phi _N}} \\ 
+  {{\psi _N}{N_t} - {S_t}{\phi _S}} \\ 
+  {{\psi _S}{S_t} - {C_t}{\phi _C}} \\ 
+  {{\psi _C}{C_t} - {T_t}{\phi _T}} \\ 
+  {{\psi _T}{T_t} - {E_t}{\phi _E}} 
+\end{array}} \right]\]
+
+
+== Notes on vignettes ==
+Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+
+- Never uses retina figures
+- Has a smaller default figure size
+- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+
+## Vignette Info
+
+Note the various macros within the `vignette` setion of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+
+## Styles
+
+The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+
+    output: 
+      rmarkdown::html_vignette:
+        css: mystyles.css
+
+## Figures
+
+The figure sizes have been customised so that you can easily put two images side-by-side. 
+
+```{r, fig.show='hold'}
+plot(1:10)
+plot(10:1)
+```
+
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+## More Examples
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))

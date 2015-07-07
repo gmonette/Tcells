@@ -1,0 +1,13 @@
+Package: Tcells
+Type: Package
+Title: Fits Tcell dynamic models with mixed models
+Version: 1.0
+Date: 2015-07-06
+Author: Georges Monette +?
+Maintainer: Georges Monette <georges@yorku.ca>
+Description: Enhancements to nlme to fit Tcell dynamic models
+License: GPL
+Depends: nlme
+Suggests: knitr
+VignetteBuilder: knitr
+LazyData: yes
