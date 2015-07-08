@@ -10,7 +10,7 @@
 
 <meta name="author" content="Georges Monette georges@yorku.ca" />
 
-<meta name="date" content="2015-07-07" />
+<meta name="date" content="2015-07-08" />
 
 <title>Variance Factorizations</title>
 
@@ -54,14 +54,25 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Variance Factorizations</h1>
 <h4 class="author"><em>Georges Monette <a href="mailto:georges@yorku.ca">georges@yorku.ca</a></em></h4>
-<h4 class="date"><em>2015-07-07</em></h4>
+<h4 class="date"><em>2015-07-08</em></h4>
 </div>
 
 
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(magrittr)</code></pre>
 <div id="triangular-factorizations" class="section level2">
 <h2>Triangular factorizations</h2>
-<p><span class="math">\[\begin{gathered}
+<p>In the ‘lme’ function in the ‘nlme’ package, the parametrization of the positive-definite variance matrix for random effects is achieved by modelling a factor of the inverse variance matrix: i.e. a matrix <span class="math">\(A\)</span> such that <span class="math">\(\sigma^2 G^{-1} = A'A\)</span>.</p>
+<p>The process is made easier if the model lends itself to an uncontrained parametrization of <span class="math">\(A\)</span>. For example, a model in which <span class="math">\(G\)</span> is any positive-definite diagonal matrix can be parametrized by setting <span class="math">\[A = \left[ {\begin{array}{*{20}{c}}
+  {\sqrt {{g_{00}}} }&amp;0&amp;0&amp;0 \\ 
+  0&amp;{\sqrt {{g_{11}}} }&amp;0&amp;0 \\ 
+  0&amp;0&amp;{\sqrt {{g_{22}}} }&amp;0 \\ 
+  0&amp;0&amp;0&amp;{\sqrt {{g_{33}}} } 
+\end{array}} \right]\]</span> Using <span class="math">\(phi_i = log( \sqrt(g_{ii}) ), i = 1,...,3\)</span> as optimization parameters provides an unconstrained parametrization of the model.</p>
+<p>Although constrained parametrizations can be used in ‘lme’, unconstrained parametrizations are, generally, more effective.</p>
+<p>If <span class="math">\(G\)</span> can be any positive-definite matrix, one unconstrained parametrization is based on the Choleski decomposition: <span class="math">\[{\sigma ^2}{G^{ - 1}} = R'R\]</span> where <span class="math">\(R\)</span> is an upper-triangular matrix that can be chosen so that the diagonal elements are positive, since <span class="math">\(G\)</span> is positive definite.</p>
+<p>The unconstrained parametrization uses the log of the diagonal elements of <span class="math">\(R\)</span> and the raw values of the upper-triangle of <span class="math">\(R\)</span>.</p>
+<p>Only a few models are provided in ‘lme’: a diagonal variance, a variance that is a multiple of the identity, full positive-definite matrices using a either a log Choleski parametrization or a ‘log spectral’ parametrization and, finally, block diagonal arrangements of the former.</p>
+<p>Since most random effects models include a random intercept, the previous models do not include a sitution in which random effects are independent of each other but not of the random intercept. Assuming independence from the random intercept results in a model that lacks location invariance and that forces the location of minimal variance of the response surface to lie, arbitrarily, over the origin.</p>
+<p><span class="math">\[\begin{aligned}
   {\left[ {\begin{array}{*{20}{c}}
   {{A_{00}}}&amp;0&amp;0&amp;0 \\ 
   {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
@@ -82,15 +93,15 @@ code > span.er { color: #ff0000; font-weight: bold; }
   {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
   {{A_{20}}}&amp;{{A_{21}}}&amp;{{A_{22}}}&amp;0 \\ 
   {{A_{30}}}&amp;{{A_{31}}}&amp;{{A_{32}}}&amp;{{A_{33}}} 
-\end{array}} \right] \hfill \\
+\end{array}} \right]   \\
    = \left[ {\begin{array}{*{20}{c}}
   {{{A'}_{00}}{A_{00}} + {{A'}_{10}}{A_{10}} + {{A'}_{20}}{A_{20}} + {{A'}_{30}}{A_{30}}}&amp;{}&amp;{}&amp;{} \\ 
   {{{A'}_{11}}{A_{10}} + {{A'}_{21}}{A_{20}} + {{A'}_{31}}{A_{30}}}&amp;{{{A'}_{11}}{A_{11}} + {{A'}_{21}}{A_{21}} + {{A'}_{31}}{A_{31}}}&amp;{}&amp;{} \\ 
   {{{A'}_{22}}{A_{20}} + {{A'}_{32}}{A_{30}}}&amp;{{{A'}_{22}}{A_{21}} + {{A'}_{32}}{A_{31}}}&amp;{{{A'}_{22}}{A_{22}} + {{A'}_{32}}{A_{32}}}&amp;{} \\ 
   {{{A'}_{33}}{A_{30}}}&amp;{{{A'}_{33}}{A_{31}}}&amp;{{{A'}_{33}}{A_{32}}}&amp;{{{A'}_{33}}{A_{33}}} 
-\end{array}} \right] \hfill \\ 
-\end{gathered} \]</span></p>
-<p><span class="math">\[\begin{gathered}
+\end{array}} \right]   \\ 
+\end{aligned} \]</span></p>
+<p><span class="math">\[\begin{aligned}
   {\left[ {\begin{array}{*{20}{c}}
   {{A_{00}}}&amp;0&amp;0&amp;0 \\ 
   {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
@@ -111,15 +122,15 @@ code > span.er { color: #ff0000; font-weight: bold; }
   {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
   {{A_{20}}}&amp;{{A_{21}}}&amp;{{A_{22}}}&amp;0 \\ 
   {{A_{30}}}&amp;{{A_{31}}}&amp;{{0_{32}}}&amp;{{A_{33}}} 
-\end{array}} \right] \hfill \\
+\end{array}} \right]   \\
    = \left[ {\begin{array}{*{20}{c}}
   {{{A'}_{00}}{A_{00}} + {{A'}_{10}}{A_{10}} + {{A'}_{20}}{A_{20}} + {{A'}_{30}}{A_{30}}}&amp;{}&amp;{}&amp;{} \\ 
   {{{A'}_{11}}{A_{10}} + {{A'}_{21}}{A_{20}} + {{A'}_{31}}{A_{30}}}&amp;{{{A'}_{11}}{A_{11}} + {{A'}_{21}}{A_{21}} + {{A'}_{31}}{A_{31}}}&amp;{}&amp;{} \\ 
   {{{A'}_{22}}{A_{20}} + {{0'}_{32}}{A_{30}}}&amp;{{{A'}_{22}}{A_{21}} + {{0'}_{32}}{A_{31}}}&amp;{{{A'}_{22}}{A_{22}} + {{0'}_{32}}{0_{32}}}&amp;{} \\ 
   {{{A'}_{33}}{A_{30}}}&amp;{{{A'}_{33}}{A_{31}}}&amp;{{{A'}_{33}}{0_{32}}}&amp;{{{A'}_{33}}{A_{33}}} 
-\end{array}} \right] \hfill \\ 
-\end{gathered} \]</span></p>
-<p><span class="math">\[\begin{gathered}
+\end{array}} \right]   \\ 
+\end{aligned} \]</span></p>
+<p><span class="math">\[\begin{aligned}
   {\left[ {\begin{array}{*{20}{c}}
   {{A_{00}}}&amp;0&amp;0&amp;0 \\ 
   {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
@@ -140,15 +151,15 @@ code > span.er { color: #ff0000; font-weight: bold; }
   {{A_{10}}}&amp;{{A_{11}}}&amp;0&amp;0 \\ 
   {{A_{20}}}&amp;{{0_{21}}}&amp;{{A_{22}}}&amp;0 \\ 
   {{A_{30}}}&amp;{{A_{31}}}&amp;{{0_{32}}}&amp;{{A_{33}}} 
-\end{array}} \right] \hfill \\
+\end{array}} \right]   \\
    = \left[ {\begin{array}{*{20}{c}}
   {{{A'}_{00}}{A_{00}} + {{A'}_{10}}{A_{10}} + {{A'}_{20}}{A_{20}} + {{A'}_{30}}{A_{30}}}&amp;{}&amp;{}&amp;{} \\ 
   {{{A'}_{11}}{A_{10}} + {{0'}_{21}}{A_{20}} + {{A'}_{31}}{A_{30}}}&amp;{{{A'}_{11}}{A_{11}} + {{0'}_{21}}{0_{21}} + {{A'}_{31}}{A_{31}}}&amp;{}&amp;{} \\ 
   {{{A'}_{22}}{A_{20}} + {{0'}_{32}}{A_{30}}}&amp;{{{A'}_{22}}{0_{21}} + {{0'}_{32}}{A_{31}}}&amp;{{{A'}_{22}}{A_{22}} + {{0'}_{32}}{0_{32}}}&amp;{} \\ 
   {{{A'}_{33}}{A_{30}}}&amp;{{{A'}_{33}}{A_{31}}}&amp;{{{A'}_{33}}{0_{32}}}&amp;{{{A'}_{33}}{A_{33}}} 
-\end{array}} \right] \hfill \\ 
-\end{gathered} \]</span></p>
-<p><span class="math">\[\begin{gathered}
+\end{array}} \right]   \\ 
+\end{aligned} \]</span></p>
+<p><span class="math">\[\begin{aligned}
   \left[ {\begin{array}{*{20}{c}}
   {{a_{11}}}&amp;{{a_{21}}}&amp;{{a_{31}}}&amp;{{a_{41}}}&amp;{{a_{51}}} \\ 
   0&amp;{{a_{22}}}&amp;{{a_{32}}}&amp;{{a_{42}}}&amp;{{a_{52}}} \\ 
@@ -161,15 +172,15 @@ code > span.er { color: #ff0000; font-weight: bold; }
   {{a_{31}}}&amp;{{a_{32}}}&amp;{{a_{33}}}&amp;0&amp;0 \\ 
   {{a_{41}}}&amp;{{a_{42}}}&amp;{{a_{43}}}&amp;{{a_{44}}}&amp;0 \\ 
   {{a_{51}}}&amp;{{a_{52}}}&amp;{{a_{53}}}&amp;{{a_{54}}}&amp;{{a_{55}}} 
-\end{array}} \right] \hfill \\
+\end{array}} \right]   \\
    = \left[ {\begin{array}{*{20}{c}}
   {a_{11}^2 + a_{21}^2 + a_{31}^2 + a_{41}^2 + a_{51}^2}&amp;{}&amp;{}&amp;{}&amp;{} \\ 
   {{a_{22}}{a_{21}} + {a_{32}}{a_{31}} + {a_{42}}{a_{41}} + {a_{52}}{a_{51}}}&amp;{a_{22}^2 + a_{32}^2 + a_{42}^2 + a_{52}^2}&amp;{}&amp;{}&amp;{} \\ 
   {{a_{33}}{a_{31}} + {a_{43}}{a_{41}} + {a_{53}}{a_{51}}}&amp;{{a_{33}}{a_{32}} + {a_{43}}{a_{42}} + {a_{53}}{a_{52}}}&amp;{a_{33}^2 + a_{43}^2 + a_{53}^2}&amp;{}&amp;{} \\ 
   {{a_{44}}{a_{41}} + {a_{54}}{a_{51}}}&amp;{{a_{44}}{a_{42}} + {a_{54}}{a_{52}}}&amp;{{a_{44}}{a_{43}} + {a_{54}}{a_{53}}}&amp;{a_{44}^2 + a_{54}^2}&amp;{} \\ 
   {{a_{55}}{a_{51}}}&amp;{{a_{55}}{a_{52}}}&amp;{{a_{55}}{a_{53}}}&amp;{{a_{55}}{a_{54}}}&amp;{a_{55}^2} 
-\end{array}} \right] \hfill \\ 
-\end{gathered} \]</span></p>
+\end{array}} \right]   \\ 
+\end{aligned} \]</span></p>
 <div id="what-patterns-of-zeros-in-l-carry-over-to-v" class="section level3">
 <h3>What patterns of zeros in <span class="math">\(L\)</span> carry over to <span class="math">\(V\)</span>?</h3>
 <p>Conjecture:</p>
@@ -196,20 +207,20 @@ code > span.er { color: #ff0000; font-weight: bold; }
   {{g_{30}}}&amp;0&amp;0&amp;{{g_{33}}} 
 \end{array}} \right]\]</span></p>
 <p>Questions to explore are verifying the coding and location invariance of the model.</p>
-<p><span class="math">\[\begin{gathered}
-  \operatorname{var} (\delta |F = 0) = {g_{00}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{var} (\delta |F = 1) = {g_{00}} + 2{g_{01}} + {g_{11}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{var} (\delta |F = 2) = {g_{00}} + 2{g_{02}} + {g_{22}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{cov} (\delta |F = 0,\delta |F = 1) = {g_{00}} + {g_{01}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{cov} (\delta |F = 2,\delta |F = 1) = {g_{00}} + {g_{01}} + {g_{20}} + {g_{21}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\ 
-\end{gathered} \]</span></p>
-<p>From this we see the following variance properties for <span class="math">\(\delta\)</span>: <span class="math">\[\begin{gathered}
-  \operatorname{var} (\delta |F = 0) = {g_{00}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{var} (\delta |F = 1) = {g_{00}} + 2{g_{01}} + {g_{11}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{var} (\delta |F = 2) = {g_{00}} + 2{g_{02}} + {g_{22}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{cov} (\delta |F = 0,\delta |F = 1) = {g_{00}} + {g_{01}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{cov} (\delta |F = 1,\delta |F = 1) = {g_{00}} + {g_{01}} + {g_{20}} + {g_{21}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\ 
-\end{gathered} \]</span></p>
+<p><span class="math">\[\begin{aligned}
+  \operatorname{var} (\delta |F = 0) = {g_{00}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{var} (\delta |F = 1) = {g_{00}} + 2{g_{01}} + {g_{11}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{var} (\delta |F = 2) = {g_{00}} + 2{g_{02}} + {g_{22}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{cov} (\delta |F = 0,\delta |F = 1) = {g_{00}} + {g_{01}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{cov} (\delta |F = 2,\delta |F = 1) = {g_{00}} + {g_{01}} + {g_{20}} + {g_{21}} + 2{g_{03}}x + {g_{33}}{x^2}   \\ 
+\end{aligned} \]</span></p>
+<p>From this we see the following variance properties for <span class="math">\(\delta\)</span>: <span class="math">\[\begin{aligned}
+  \operatorname{var} (\delta |F = 0) = {g_{00}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{var} (\delta |F = 1) = {g_{00}} + 2{g_{01}} + {g_{11}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{var} (\delta |F = 2) = {g_{00}} + 2{g_{02}} + {g_{22}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{cov} (\delta |F = 0,\delta |F = 1) = {g_{00}} + {g_{01}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{cov} (\delta |F = 1,\delta |F = 1) = {g_{00}} + {g_{01}} + {g_{20}} + {g_{21}} + 2{g_{03}}x + {g_{33}}{x^2}   \\ 
+\end{aligned} \]</span></p>
 </div>
 </div>
 <div id="variance-factorizations" class="section level2">
@@ -368,12 +379,12 @@ x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">
     for(i in <span class="dv">1</span>:<span class="dv">1000</span>) <span class="kw">R2L</span>(x)
   )</code></pre>
 <pre><code>##    user  system elapsed 
-##    2.23    0.00    2.28</code></pre>
+##    1.64    0.00    1.65</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(
     for(i in <span class="dv">1</span>:<span class="dv">1000</span>) <span class="kw">L2R</span>(x)
   )</code></pre>
 <pre><code>##    user  system elapsed 
-##    1.51    0.00    1.51</code></pre>
+##    1.24    0.00    1.23</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Check that it works</span>
 
 V</code></pre>
@@ -383,31 +394,31 @@ V</code></pre>
 ## [3,]    1    1    4</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">Vr &lt;-<span class="st"> </span><span class="kw">crossprod</span>( <span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">9</span>),<span class="dv">3</span>))
 <span class="kw">svd</span>(Vr)$d</code></pre>
-<pre><code>## [1] 4.4874418 2.1742576 0.9250973</code></pre>
+<pre><code>## [1] 5.2281827 1.1050977 0.6018031</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">lc &lt;-<span class="st"> </span><span class="kw">cholL</span>(Vr)
 Vr -<span class="st"> </span><span class="kw">crossprod</span>(lc)</code></pre>
-<pre><code>##      [,1] [,2]         [,3]
-## [1,]    0    0 0.000000e+00
-## [2,]    0    0 0.000000e+00
-## [3,]    0    0 4.440892e-16</code></pre>
+<pre><code>##               [,1]          [,2]         [,3]
+## [1,]  2.220446e-16 -2.775558e-17 0.000000e+00
+## [2,] -2.775558e-17  1.110223e-16 0.000000e+00
+## [3,]  0.000000e+00  0.000000e+00 8.881784e-16</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">rc &lt;-<span class="st"> </span><span class="kw">chol</span>(Vr)
 Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc)</code></pre>
-<pre><code>##      [,1]         [,2]         [,3]
-## [1,]    0 0.000000e+00 0.000000e+00
-## [2,]    0 0.000000e+00 2.220446e-16
-## [3,]    0 2.220446e-16 0.000000e+00</code></pre>
+<pre><code>##               [,1]          [,2]          [,3]
+## [1,] -2.220446e-16  0.000000e+00  2.220446e-16
+## [2,]  0.000000e+00  0.000000e+00 -2.775558e-17
+## [3,]  2.220446e-16 -2.775558e-17 -8.881784e-16</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">lc2r &lt;-<span class="st"> </span><span class="kw">L2R</span>(lc)
 Vr -<span class="st"> </span><span class="kw">crossprod</span>(lc2r)</code></pre>
-<pre><code>##               [,1]         [,2]          [,3]
-## [1,] -8.881784e-16 0.000000e+00 -1.110223e-16
-## [2,]  0.000000e+00 0.000000e+00  2.220446e-16
-## [3,] -1.110223e-16 2.220446e-16  0.000000e+00</code></pre>
+<pre><code>##              [,1]          [,2]          [,3]
+## [1,] 2.220446e-16  0.000000e+00  0.000000e+00
+## [2,] 0.000000e+00  0.000000e+00 -1.110223e-16
+## [3,] 0.000000e+00 -1.110223e-16  8.881784e-16</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">rc2l &lt;-<span class="st"> </span><span class="kw">R2L</span>(rc)
 Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc2l)</code></pre>
-<pre><code>##               [,1] [,2]         [,3]
-## [1,] -4.440892e-16    0 0.000000e+00
-## [2,]  0.000000e+00    0 0.000000e+00
-## [3,]  0.000000e+00    0 4.440892e-16</code></pre>
+<pre><code>##               [,1]         [,2]         [,3]
+## [1,] -4.440892e-16 2.775558e-17 2.220446e-16
+## [2,]  2.775558e-17 1.110223e-16 0.000000e+00
+## [3,]  2.220446e-16 0.000000e+00 8.881784e-16</code></pre>
 </div>
 </div>
 <div id="creating-a-pdclass-based-on-pdlogchol" class="section level2">
@@ -455,16 +466,16 @@ Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc2l)</code></pre
 <p>If the object created by <code>solve.pdInd</code> is used in other ways then the problem might be more difficult.</p>
 <p>One hopes that the approach of using <code>solve</code> to create the representation of <span class="math">\(V^{-1}\)</span> arose simply from the fact that the <code>pdMat</code> classes in the original version of <code>nlme</code> all lent themselves to this approach.</p>
 <p>Here are some relevant expressions:</p>
-<p><span class="math">\[\begin{gathered}
+<p><span class="math">\[\begin{aligned}
   V = \left[ {\begin{array}{*{20}{c}}
   A&amp;{B'} \\ 
   B&amp;C 
-\end{array}} \right] \hfill \\
+\end{array}} \right]   \\
   L = \left[ {\begin{array}{*{20}{c}}
   D&amp;0 \\ 
   E&amp;F 
-\end{array}} \right] \hfill \\ 
-\end{gathered} \]</span></p>
+\end{array}} \right]   \\ 
+\end{aligned} \]</span></p>
 <p><span class="math">\[\left[ {\begin{array}{*{20}{c}}
   A&amp;{B'} \\ 
   B&amp;C 
@@ -537,7 +548,7 @@ Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc2l)</code></pre
 ##         val
 ##     }
 ## }
-## &lt;bytecode: 0x000000001e2f2b08&gt;
+## &lt;bytecode: 0x000000001e3d3b50&gt;
 ## &lt;environment: namespace:nlme&gt;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">methods</span>(<span class="dt">class=</span><span class="st">&quot;pdMat&quot;</span>)</code></pre>
 <pre><code>##  [1] [.pdMat*             [&lt;-.pdMat*           as.matrix.pdMat*    
@@ -556,7 +567,7 @@ Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc2l)</code></pre
 ##     class(object) &lt;- c(&quot;pdLogChol&quot;, &quot;pdMat&quot;)
 ##     pdConstruct(object, value, form, nam, data)
 ## }
-## &lt;bytecode: 0x0000000013368a98&gt;
+## &lt;bytecode: 0x000000001e613f88&gt;
 ## &lt;environment: namespace:nlme&gt;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">nlme:::pdSymm</code></pre>
 <pre><code>## function (value = numeric(0), form = NULL, nam = NULL, data = parent.frame()) 
@@ -565,7 +576,7 @@ Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc2l)</code></pre
 ##     class(object) &lt;- c(&quot;pdSymm&quot;, &quot;pdMat&quot;)
 ##     pdConstruct(object, value, form, nam, data)
 ## }
-## &lt;bytecode: 0x000000001c925700&gt;
+## &lt;bytecode: 0x000000001e68b8c8&gt;
 ## &lt;environment: namespace:nlme&gt;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">nlme:::pdMat</code></pre>
 <pre><code>## function (value = numeric(0), form = NULL, nam = NULL, data = sys.frame(sys.parent()), 
@@ -578,7 +589,7 @@ Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc2l)</code></pre
 ##     class(object) &lt;- unique(c(pdClass, &quot;pdMat&quot;))
 ##     pdConstruct(object, value, form, nam, data)
 ## }
-## &lt;bytecode: 0x000000001c836428&gt;
+## &lt;bytecode: 0x000000001e703e90&gt;
 ## &lt;environment: namespace:nlme&gt;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">pdFactorfull &lt;-<span class="st"> </span>function (object) 
 {

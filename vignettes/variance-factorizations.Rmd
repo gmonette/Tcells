@@ -8,13 +8,44 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
-```{r}
+```{r,include=FALSE}
 library(magrittr)
 
 ```
 ## Triangular factorizations
 
-\[\begin{gathered}
+In the 'lme' function in the 'nlme' package, the parametrization of the positive-definite variance matrix for random effects is achieved by modelling a factor of the inverse variance matrix: i.e. a matrix $A$ such that $\sigma^2 G^{-1} = A'A$.
+
+The process is made easier if the model lends itself to an
+uncontrained parametrization of $A$.  For example, a model in which $G$ is any positive-definite diagonal matrix can be parametrized
+by setting 
+\[A = \left[ {\begin{array}{*{20}{c}}
+  {\sqrt {{g_{00}}} }&0&0&0 \\ 
+  0&{\sqrt {{g_{11}}} }&0&0 \\ 
+  0&0&{\sqrt {{g_{22}}} }&0 \\ 
+  0&0&0&{\sqrt {{g_{33}}} } 
+\end{array}} \right]\]
+Using $phi_i = log( \sqrt(g_{ii}) ), i = 1,...,3$ as optimization parameters provides an unconstrained parametrization of the model.
+
+Although constrained parametrizations can be used in 'lme', unconstrained parametrizations are, generally, more effective.
+
+If $G$ can be any positive-definite matrix, one unconstrained parametrization is based on the Choleski decomposition: \[{\sigma ^2}{G^{ - 1}} = R'R\]
+where $R$ is an upper-triangular matrix that can be chosen so that the diagonal elements are positive, since $G$ is positive definite.
+
+The unconstrained parametrization uses the log of the diagonal elements of $R$ and the raw values of the upper-triangle of $R$.
+
+Only a few models are provided in 'lme': a diagonal variance, a variance that is a multiple of the identity, full positive-definite matrices using a either a log Choleski parametrization or a 'log spectral' parametrization and, finally, block diagonal arrangements of the former.  
+
+Since most random effects models include a random intercept, the previous models do not include a sitution in which random effects are independent of each other but not of the random intercept. Assuming independence from the random intercept results in a model that lacks location invariance and that forces the location of minimal variance of the response surface to lie, arbitrarily, over the origin.
+
+
+
+
+
+
+
+
+\[\begin{aligned}
   {\left[ {\begin{array}{*{20}{c}}
   {{A_{00}}}&0&0&0 \\ 
   {{A_{10}}}&{{A_{11}}}&0&0 \\ 
@@ -35,16 +66,16 @@ library(magrittr)
   {{A_{10}}}&{{A_{11}}}&0&0 \\ 
   {{A_{20}}}&{{A_{21}}}&{{A_{22}}}&0 \\ 
   {{A_{30}}}&{{A_{31}}}&{{A_{32}}}&{{A_{33}}} 
-\end{array}} \right] \hfill \\
+\end{array}} \right]   \\
    = \left[ {\begin{array}{*{20}{c}}
   {{{A'}_{00}}{A_{00}} + {{A'}_{10}}{A_{10}} + {{A'}_{20}}{A_{20}} + {{A'}_{30}}{A_{30}}}&{}&{}&{} \\ 
   {{{A'}_{11}}{A_{10}} + {{A'}_{21}}{A_{20}} + {{A'}_{31}}{A_{30}}}&{{{A'}_{11}}{A_{11}} + {{A'}_{21}}{A_{21}} + {{A'}_{31}}{A_{31}}}&{}&{} \\ 
   {{{A'}_{22}}{A_{20}} + {{A'}_{32}}{A_{30}}}&{{{A'}_{22}}{A_{21}} + {{A'}_{32}}{A_{31}}}&{{{A'}_{22}}{A_{22}} + {{A'}_{32}}{A_{32}}}&{} \\ 
   {{{A'}_{33}}{A_{30}}}&{{{A'}_{33}}{A_{31}}}&{{{A'}_{33}}{A_{32}}}&{{{A'}_{33}}{A_{33}}} 
-\end{array}} \right] \hfill \\ 
-\end{gathered} \]
+\end{array}} \right]   \\ 
+\end{aligned} \]
 
-\[\begin{gathered}
+\[\begin{aligned}
   {\left[ {\begin{array}{*{20}{c}}
   {{A_{00}}}&0&0&0 \\ 
   {{A_{10}}}&{{A_{11}}}&0&0 \\ 
@@ -65,17 +96,17 @@ library(magrittr)
   {{A_{10}}}&{{A_{11}}}&0&0 \\ 
   {{A_{20}}}&{{A_{21}}}&{{A_{22}}}&0 \\ 
   {{A_{30}}}&{{A_{31}}}&{{0_{32}}}&{{A_{33}}} 
-\end{array}} \right] \hfill \\
+\end{array}} \right]   \\
    = \left[ {\begin{array}{*{20}{c}}
   {{{A'}_{00}}{A_{00}} + {{A'}_{10}}{A_{10}} + {{A'}_{20}}{A_{20}} + {{A'}_{30}}{A_{30}}}&{}&{}&{} \\ 
   {{{A'}_{11}}{A_{10}} + {{A'}_{21}}{A_{20}} + {{A'}_{31}}{A_{30}}}&{{{A'}_{11}}{A_{11}} + {{A'}_{21}}{A_{21}} + {{A'}_{31}}{A_{31}}}&{}&{} \\ 
   {{{A'}_{22}}{A_{20}} + {{0'}_{32}}{A_{30}}}&{{{A'}_{22}}{A_{21}} + {{0'}_{32}}{A_{31}}}&{{{A'}_{22}}{A_{22}} + {{0'}_{32}}{0_{32}}}&{} \\ 
   {{{A'}_{33}}{A_{30}}}&{{{A'}_{33}}{A_{31}}}&{{{A'}_{33}}{0_{32}}}&{{{A'}_{33}}{A_{33}}} 
-\end{array}} \right] \hfill \\ 
-\end{gathered} \]
+\end{array}} \right]   \\ 
+\end{aligned} \]
 
 
-\[\begin{gathered}
+\[\begin{aligned}
   {\left[ {\begin{array}{*{20}{c}}
   {{A_{00}}}&0&0&0 \\ 
   {{A_{10}}}&{{A_{11}}}&0&0 \\ 
@@ -96,17 +127,17 @@ library(magrittr)
   {{A_{10}}}&{{A_{11}}}&0&0 \\ 
   {{A_{20}}}&{{0_{21}}}&{{A_{22}}}&0 \\ 
   {{A_{30}}}&{{A_{31}}}&{{0_{32}}}&{{A_{33}}} 
-\end{array}} \right] \hfill \\
+\end{array}} \right]   \\
    = \left[ {\begin{array}{*{20}{c}}
   {{{A'}_{00}}{A_{00}} + {{A'}_{10}}{A_{10}} + {{A'}_{20}}{A_{20}} + {{A'}_{30}}{A_{30}}}&{}&{}&{} \\ 
   {{{A'}_{11}}{A_{10}} + {{0'}_{21}}{A_{20}} + {{A'}_{31}}{A_{30}}}&{{{A'}_{11}}{A_{11}} + {{0'}_{21}}{0_{21}} + {{A'}_{31}}{A_{31}}}&{}&{} \\ 
   {{{A'}_{22}}{A_{20}} + {{0'}_{32}}{A_{30}}}&{{{A'}_{22}}{0_{21}} + {{0'}_{32}}{A_{31}}}&{{{A'}_{22}}{A_{22}} + {{0'}_{32}}{0_{32}}}&{} \\ 
   {{{A'}_{33}}{A_{30}}}&{{{A'}_{33}}{A_{31}}}&{{{A'}_{33}}{0_{32}}}&{{{A'}_{33}}{A_{33}}} 
-\end{array}} \right] \hfill \\ 
-\end{gathered} \]
+\end{array}} \right]   \\ 
+\end{aligned} \]
 
 
-\[\begin{gathered}
+\[\begin{aligned}
   \left[ {\begin{array}{*{20}{c}}
   {{a_{11}}}&{{a_{21}}}&{{a_{31}}}&{{a_{41}}}&{{a_{51}}} \\ 
   0&{{a_{22}}}&{{a_{32}}}&{{a_{42}}}&{{a_{52}}} \\ 
@@ -119,15 +150,15 @@ library(magrittr)
   {{a_{31}}}&{{a_{32}}}&{{a_{33}}}&0&0 \\ 
   {{a_{41}}}&{{a_{42}}}&{{a_{43}}}&{{a_{44}}}&0 \\ 
   {{a_{51}}}&{{a_{52}}}&{{a_{53}}}&{{a_{54}}}&{{a_{55}}} 
-\end{array}} \right] \hfill \\
+\end{array}} \right]   \\
    = \left[ {\begin{array}{*{20}{c}}
   {a_{11}^2 + a_{21}^2 + a_{31}^2 + a_{41}^2 + a_{51}^2}&{}&{}&{}&{} \\ 
   {{a_{22}}{a_{21}} + {a_{32}}{a_{31}} + {a_{42}}{a_{41}} + {a_{52}}{a_{51}}}&{a_{22}^2 + a_{32}^2 + a_{42}^2 + a_{52}^2}&{}&{}&{} \\ 
   {{a_{33}}{a_{31}} + {a_{43}}{a_{41}} + {a_{53}}{a_{51}}}&{{a_{33}}{a_{32}} + {a_{43}}{a_{42}} + {a_{53}}{a_{52}}}&{a_{33}^2 + a_{43}^2 + a_{53}^2}&{}&{} \\ 
   {{a_{44}}{a_{41}} + {a_{54}}{a_{51}}}&{{a_{44}}{a_{42}} + {a_{54}}{a_{52}}}&{{a_{44}}{a_{43}} + {a_{54}}{a_{53}}}&{a_{44}^2 + a_{54}^2}&{} \\ 
   {{a_{55}}{a_{51}}}&{{a_{55}}{a_{52}}}&{{a_{55}}{a_{53}}}&{{a_{55}}{a_{54}}}&{a_{55}^2} 
-\end{array}} \right] \hfill \\ 
-\end{gathered} \]
+\end{array}} \right]   \\ 
+\end{aligned} \]
 
 
 
@@ -162,22 +193,22 @@ $f_1 = I_{F=1}$, $f_2 = I_{F=2}$, and
 
 Questions to explore are verifying the coding and location invariance of the model.
 
-\[\begin{gathered}
-  \operatorname{var} (\delta |F = 0) = {g_{00}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{var} (\delta |F = 1) = {g_{00}} + 2{g_{01}} + {g_{11}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{var} (\delta |F = 2) = {g_{00}} + 2{g_{02}} + {g_{22}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{cov} (\delta |F = 0,\delta |F = 1) = {g_{00}} + {g_{01}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{cov} (\delta |F = 2,\delta |F = 1) = {g_{00}} + {g_{01}} + {g_{20}} + {g_{21}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\ 
-\end{gathered} \]
+\[\begin{aligned}
+  \operatorname{var} (\delta |F = 0) = {g_{00}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{var} (\delta |F = 1) = {g_{00}} + 2{g_{01}} + {g_{11}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{var} (\delta |F = 2) = {g_{00}} + 2{g_{02}} + {g_{22}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{cov} (\delta |F = 0,\delta |F = 1) = {g_{00}} + {g_{01}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{cov} (\delta |F = 2,\delta |F = 1) = {g_{00}} + {g_{01}} + {g_{20}} + {g_{21}} + 2{g_{03}}x + {g_{33}}{x^2}   \\ 
+\end{aligned} \]
 
 From this we see the following variance properties for $\delta$:
-\[\begin{gathered}
-  \operatorname{var} (\delta |F = 0) = {g_{00}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{var} (\delta |F = 1) = {g_{00}} + 2{g_{01}} + {g_{11}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{var} (\delta |F = 2) = {g_{00}} + 2{g_{02}} + {g_{22}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{cov} (\delta |F = 0,\delta |F = 1) = {g_{00}} + {g_{01}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\
-  \operatorname{cov} (\delta |F = 1,\delta |F = 1) = {g_{00}} + {g_{01}} + {g_{20}} + {g_{21}} + 2{g_{03}}x + {g_{33}}{x^2} \hfill \\ 
-\end{gathered} \]
+\[\begin{aligned}
+  \operatorname{var} (\delta |F = 0) = {g_{00}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{var} (\delta |F = 1) = {g_{00}} + 2{g_{01}} + {g_{11}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{var} (\delta |F = 2) = {g_{00}} + 2{g_{02}} + {g_{22}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{cov} (\delta |F = 0,\delta |F = 1) = {g_{00}} + {g_{01}} + 2{g_{03}}x + {g_{33}}{x^2}   \\
+  \operatorname{cov} (\delta |F = 1,\delta |F = 1) = {g_{00}} + {g_{01}} + {g_{20}} + {g_{21}} + 2{g_{03}}x + {g_{33}}{x^2}   \\ 
+\end{aligned} \]
 
 
 
@@ -347,16 +378,16 @@ One hopes that the approach of using `solve` to create the representation of $V^
 
 Here are some relevant expressions:
 
-\[\begin{gathered}
+\[\begin{aligned}
   V = \left[ {\begin{array}{*{20}{c}}
   A&{B'} \\ 
   B&C 
-\end{array}} \right] \hfill \\
+\end{array}} \right]   \\
   L = \left[ {\begin{array}{*{20}{c}}
   D&0 \\ 
   E&F 
-\end{array}} \right] \hfill \\ 
-\end{gathered} \]
+\end{array}} \right]   \\ 
+\end{aligned} \]
 
 \[\left[ {\begin{array}{*{20}{c}}
   A&{B'} \\ 

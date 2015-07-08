@@ -10,7 +10,7 @@
 
 <meta name="author" content="GM + ?" />
 
-<meta name="date" content="2015-07-07" />
+<meta name="date" content="2015-07-08" />
 
 <title>T-cell dynamics</title>
 
@@ -28,12 +28,20 @@
 <div id="header">
 <h1 class="title">T-cell dynamics</h1>
 <h4 class="author"><em>GM + ?</em></h4>
-<h4 class="date"><em>2015-07-07</em></h4>
+<h4 class="date"><em>2015-07-08</em></h4>
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#model-for-t-cell-dynamics">Model for T-cell dynamics</a><ul>
+<li><a href="#adjustment-for-cell-densities-from-blood-samples-of-different-volumes">Adjustment for cell densities from blood samples of different volumes</a></li>
+</ul></li>
+<li><a href="#using-mixed-models">Using mixed models</a></li>
+</ul>
+</div>
 
-<div id="using-mixed-models-to-fit-t-cell-dynamic-models" class="section level2">
-<h2>Using mixed models to fit T-cell dynamic models</h2>
+<div id="model-for-t-cell-dynamics" class="section level2">
+<h2>Model for T-cell dynamics</h2>
 <p>Subjects are observed at a number of occasions at different times. On each occasion the densities of cells of five different types are recorded.</p>
 <p>The process for these five types, <span class="math">\(N, S, C, T\)</span> and <span class="math">\(E\)</span>, are modelled as follows:</p>
 <p><span class="math">\[\begin{aligned}
@@ -125,6 +133,19 @@
   0&amp;0&amp;0&amp;{ - {\psi _T}{T_t}}&amp;{{\psi _T}{T_t} + {\delta _E}{E_t}} 
 \end{array}} \right]\]</span></p>
 <p>This formulation of the model allows an unconstrained parametrization by using the log of each parameter, each of which is positive, as the actual working parameter for optimization.</p>
+<div id="adjustment-for-cell-densities-from-blood-samples-of-different-volumes" class="section level3">
+<h3>Adjustment for cell densities from blood samples of different volumes</h3>
+<p>If the response variable is either a number of cells counted in a situation in which the volume of the sample from which cells are counted varies from observation to observation or if the response a cell density, i.e. number of cells observed divided by the volume of the sample examined, then the model above needs to be adjusted.</p>
+<p>Let <span class="math">\(X_t, Y_t\)</span> be cells densities observed in a smaple of volume <span class="math">\(V_t\)</span>. Let <span class="math">\(X_t^c, Y_t^c\)</span> be the actual counts so that <span class="math">\[\left( {\begin{array}{*{20}{c}}
+  {{X_t}} \\ 
+  {{Y_t}} 
+\end{array}} \right) = \frac{1}{{{V_t}}}\left( {\begin{array}{*{20}{c}}
+  {X_t^c} \\ 
+  {Y_t^c} 
+\end{array}} \right)\]</span> If <span class="math">\(\left( {\begin{array}{*{20}{c}}  {X_t^c} \\  {Y_t^c} \end{array}} \right)\)</span> has expectation <span class="math">\(\left( {\begin{array}{*{20}{c}}  {{\mu _X}} \\  {{\mu _Y}} \end{array}} \right)\)</span> and variance <span class="math">\(\left[ {\begin{array}{*{20}{c}}  {{\sigma _{XX}}}&amp;{{\sigma _{XY}}} \\  {{\sigma _{YX}}}&amp;{{\sigma _{YY}}} \end{array}} \right]\)</span> then the expectation and variance of <span class="math">\((X_t, Y_t)'\)</span> will be <span class="math">\(\frac{1}{{{V_t}}}\left( {\begin{array}{*{20}{c}}  {{\mu _X}} \\  {{\mu _Y}} \end{array}} \right)\)</span> and <span class="math">\(\frac{1}{{V_t^2}}\left[ {\begin{array}{*{20}{c}}  {{\sigma _{XX}}}&amp;{{\sigma _{XY}}} \\  {{\sigma _{YX}}}&amp;{{\sigma _{YY}}} \end{array}} \right]\)</span>, respectively.</p>
+<p>Thus, blood sample volumes that vary between measurements can be taken into account but need to be incorporated into the model. Simply standardizing by, for example, multiplying the densities so they refer to a common volume will not work since the resulting relationship between the expectation and the variance of the response variables will not be that obtained above assuming Poisson components.</p>
+<p>If the measurements are cell densities that are always obtained from the same blood volume, then the easiest approch is to multiply each obervation by the common value of <span class="math">\(V\)</span> which will yield the cell counts modeled as discussed in the previous sections.</p>
+</div>
 </div>
 <div id="using-mixed-models" class="section level2">
 <h2>Using mixed models</h2>
@@ -144,7 +165,7 @@
 library(devtools)
 install_github('gmonette/Tcells')
 library(Tcells)</code></pre>
-<p>Since package is being developed it is good practice to reinstall it frequently.</p>
+<p>Since the package is being developed it is good practice to reinstall it frequently.</p>
 </div>
 
 

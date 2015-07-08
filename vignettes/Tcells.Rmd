@@ -2,14 +2,16 @@
 title: "T-cell dynamics"
 author: "GM + ?"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
-## Using mixed models to fit T-cell dynamic models
+## Model for T-cell dynamics
 
 Subjects are observed at a number of occasions at different times. On each occasion the densities of cells of five different types are recorded.
 
@@ -130,6 +132,47 @@ and the variance-covariance matrix is
 
 This formulation of the model allows an unconstrained parametrization by using the log of each parameter, each of which is positive, as the actual working parameter for optimization.
 
+### Adjustment for cell densities from blood samples of different volumes
+
+If the response variable is either a number of cells counted in a situation in which the volume of the sample from which cells are counted varies from observation to observation or if the response a cell density, i.e. number of cells observed divided by the volume of the sample examined, then the model above needs to be adjusted.
+
+Let $X_t, Y_t$ be cells densities observed in a smaple of volume $V_t$. Let $X_t^c, Y_t^c$ be the actual counts so that
+\[\left( {\begin{array}{*{20}{c}}
+  {{X_t}} \\ 
+  {{Y_t}} 
+\end{array}} \right) = \frac{1}{{{V_t}}}\left( {\begin{array}{*{20}{c}}
+  {X_t^c} \\ 
+  {Y_t^c} 
+\end{array}} \right)\]
+If $\left( {\begin{array}{*{20}{c}}
+  {X_t^c} \\ 
+  {Y_t^c} 
+\end{array}} \right)$ has expectation 
+$\left( {\begin{array}{*{20}{c}}
+  {{\mu _X}} \\ 
+  {{\mu _Y}} 
+\end{array}} \right)$ and variance
+$\left[ {\begin{array}{*{20}{c}}
+  {{\sigma _{XX}}}&{{\sigma _{XY}}} \\ 
+  {{\sigma _{YX}}}&{{\sigma _{YY}}} 
+\end{array}} \right]$
+then the expectation and variance of $(X_t, Y_t)'$ will be
+$\frac{1}{{{V_t}}}\left( {\begin{array}{*{20}{c}}
+  {{\mu _X}} \\ 
+  {{\mu _Y}} 
+\end{array}} \right)$ and $\frac{1}{{V_t^2}}\left[ {\begin{array}{*{20}{c}}
+  {{\sigma _{XX}}}&{{\sigma _{XY}}} \\ 
+  {{\sigma _{YX}}}&{{\sigma _{YY}}} 
+\end{array}} \right]$, respectively.
+
+Thus, blood sample volumes that vary between measurements can be taken into account but need to be incorporated into the model.
+Simply standardizing by, for example, multiplying the densities
+so they refer to a common volume will not work since the resulting
+relationship between the expectation and the variance of the
+response variables will not be that obtained above assuming Poisson components.
+
+If the measurements are cell densities that are always obtained from the same blood volume, then the easiest approch is to multiply each obervation by the common value of $V$ which will yield the cell counts modeled as discussed in the previous sections. 
+
 ## Using mixed models
 
 In most applications of mixed models, there is a univariate response variable whose expectation is determined by a linear model some of whose coefficients are fixed unknown parameters and others vary randomly from cluster to cluster. The model for the variance of the random parameters can be selected from a limited number of 
@@ -165,4 +208,4 @@ install_github('gmonette/Tcells')
 library(Tcells)
 ```
 
-Since package is being developed it is good practice to reinstall it frequently.
+Since the package is being developed it is good practice to reinstall it frequently.
