@@ -8,6 +8,8 @@ Maintainer: Georges Monette <georges@yorku.ca>
 Description: Enhancements to nlme to fit Tcell dynamic models
 License: GPL
 Depends: nlme
-Suggests: knitr
+Suggests: knitr,
+	rmarkdown,
+	magrittr
 VignetteBuilder: knitr
 LazyData: yes

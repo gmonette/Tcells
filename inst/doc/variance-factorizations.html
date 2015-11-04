@@ -10,7 +10,7 @@
 
 <meta name="author" content="Georges Monette georges@yorku.ca" />
 
-<meta name="date" content="2015-07-08" />
+<meta name="date" content="2015-07-18" />
 
 <title>Variance Factorizations</title>
 
@@ -54,9 +54,27 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Variance Factorizations</h1>
 <h4 class="author"><em>Georges Monette <a href="mailto:georges@yorku.ca">georges@yorku.ca</a></em></h4>
-<h4 class="date"><em>2015-07-08</em></h4>
+<h4 class="date"><em>2015-07-18</em></h4>
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#triangular-factorizations">Triangular factorizations</a><ul>
+<li><a href="#what-patterns-of-zeros-in-l-carry-over-to-v">What patterns of zeros in <span class="math">\(L\)</span> carry over to <span class="math">\(V\)</span>?</a></li>
+<li><a href="#models-for-categorical-factors">Models for categorical factors</a></li>
+</ul></li>
+<li><a href="#variance-factorizations">Variance Factorizations</a><ul>
+<li><a href="#is-there-an-efficient-way-to-turn-a-right-factor-into-a-left-factor">Is there an efficient way to turn a right factor into a left factor?</a></li>
+</ul></li>
+<li><a href="#creating-a-pdclass-based-on-pdlogchol">Creating a pdClass based on pdLogChol</a></li>
+<li><a href="#solve.pdind">solve.pdInd</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#vignette-info">Vignette Info</a></li>
+<li><a href="#styles">Styles</a></li>
+<li><a href="#figures">Figures</a></li>
+<li><a href="#more-examples">More Examples</a></li>
+</ul>
+</div>
 
 <div id="triangular-factorizations" class="section level2">
 <h2>Triangular factorizations</h2>
@@ -379,12 +397,12 @@ x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">
     for(i in <span class="dv">1</span>:<span class="dv">1000</span>) <span class="kw">R2L</span>(x)
   )</code></pre>
 <pre><code>##    user  system elapsed 
-##    1.64    0.00    1.65</code></pre>
+##    1.78    0.07    1.89</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(
     for(i in <span class="dv">1</span>:<span class="dv">1000</span>) <span class="kw">L2R</span>(x)
   )</code></pre>
 <pre><code>##    user  system elapsed 
-##    1.24    0.00    1.23</code></pre>
+##    1.32    0.00    1.39</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Check that it works</span>
 
 V</code></pre>
@@ -394,31 +412,31 @@ V</code></pre>
 ## [3,]    1    1    4</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">Vr &lt;-<span class="st"> </span><span class="kw">crossprod</span>( <span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">9</span>),<span class="dv">3</span>))
 <span class="kw">svd</span>(Vr)$d</code></pre>
-<pre><code>## [1] 5.2281827 1.1050977 0.6018031</code></pre>
+<pre><code>## [1] 4.6129003 2.6753404 0.4055732</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">lc &lt;-<span class="st"> </span><span class="kw">cholL</span>(Vr)
 Vr -<span class="st"> </span><span class="kw">crossprod</span>(lc)</code></pre>
-<pre><code>##               [,1]          [,2]         [,3]
-## [1,]  2.220446e-16 -2.775558e-17 0.000000e+00
-## [2,] -2.775558e-17  1.110223e-16 0.000000e+00
-## [3,]  0.000000e+00  0.000000e+00 8.881784e-16</code></pre>
+<pre><code>##      [,1]          [,2] [,3]
+## [1,]    0  0.000000e+00    0
+## [2,]    0 -2.220446e-16    0
+## [3,]    0  0.000000e+00    0</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">rc &lt;-<span class="st"> </span><span class="kw">chol</span>(Vr)
 Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc)</code></pre>
-<pre><code>##               [,1]          [,2]          [,3]
-## [1,] -2.220446e-16  0.000000e+00  2.220446e-16
-## [2,]  0.000000e+00  0.000000e+00 -2.775558e-17
-## [3,]  2.220446e-16 -2.775558e-17 -8.881784e-16</code></pre>
+<pre><code>##              [,1]         [,2]         [,3]
+## [1,] 0.000000e+00 0.000000e+00 1.110223e-16
+## [2,] 0.000000e+00 0.000000e+00 5.551115e-17
+## [3,] 1.110223e-16 5.551115e-17 0.000000e+00</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">lc2r &lt;-<span class="st"> </span><span class="kw">L2R</span>(lc)
 Vr -<span class="st"> </span><span class="kw">crossprod</span>(lc2r)</code></pre>
-<pre><code>##              [,1]          [,2]          [,3]
-## [1,] 2.220446e-16  0.000000e+00  0.000000e+00
-## [2,] 0.000000e+00  0.000000e+00 -1.110223e-16
-## [3,] 0.000000e+00 -1.110223e-16  8.881784e-16</code></pre>
+<pre><code>##              [,1]         [,2]         [,3]
+## [1,] 0.000000e+00 0.000000e+00 1.110223e-16
+## [2,] 0.000000e+00 0.000000e+00 5.551115e-17
+## [3,] 1.110223e-16 5.551115e-17 0.000000e+00</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">rc2l &lt;-<span class="st"> </span><span class="kw">R2L</span>(rc)
 Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc2l)</code></pre>
-<pre><code>##               [,1]         [,2]         [,3]
-## [1,] -4.440892e-16 2.775558e-17 2.220446e-16
-## [2,]  2.775558e-17 1.110223e-16 0.000000e+00
-## [3,]  2.220446e-16 0.000000e+00 8.881784e-16</code></pre>
+<pre><code>##              [,1]          [,2]         [,3]
+## [1,] 8.881784e-16  4.440892e-16 1.110223e-16
+## [2,] 4.440892e-16 -2.220446e-16 6.938894e-17
+## [3,] 1.110223e-16  6.938894e-17 0.000000e+00</code></pre>
 </div>
 </div>
 <div id="creating-a-pdclass-based-on-pdlogchol" class="section level2">
@@ -548,7 +566,7 @@ Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc2l)</code></pre
 ##         val
 ##     }
 ## }
-## &lt;bytecode: 0x000000001e3d3b50&gt;
+## &lt;bytecode: 0x000000000a186a18&gt;
 ## &lt;environment: namespace:nlme&gt;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">methods</span>(<span class="dt">class=</span><span class="st">&quot;pdMat&quot;</span>)</code></pre>
 <pre><code>##  [1] [.pdMat*             [&lt;-.pdMat*           as.matrix.pdMat*    
@@ -567,7 +585,7 @@ Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc2l)</code></pre
 ##     class(object) &lt;- c(&quot;pdLogChol&quot;, &quot;pdMat&quot;)
 ##     pdConstruct(object, value, form, nam, data)
 ## }
-## &lt;bytecode: 0x000000001e613f88&gt;
+## &lt;bytecode: 0x000000002e803bb0&gt;
 ## &lt;environment: namespace:nlme&gt;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">nlme:::pdSymm</code></pre>
 <pre><code>## function (value = numeric(0), form = NULL, nam = NULL, data = parent.frame()) 
@@ -576,7 +594,7 @@ Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc2l)</code></pre
 ##     class(object) &lt;- c(&quot;pdSymm&quot;, &quot;pdMat&quot;)
 ##     pdConstruct(object, value, form, nam, data)
 ## }
-## &lt;bytecode: 0x000000001e68b8c8&gt;
+## &lt;bytecode: 0x000000002e79c3b8&gt;
 ## &lt;environment: namespace:nlme&gt;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">nlme:::pdMat</code></pre>
 <pre><code>## function (value = numeric(0), form = NULL, nam = NULL, data = sys.frame(sys.parent()), 
@@ -589,7 +607,7 @@ Vr -<span class="st"> </span><span class="kw">crossprod</span>(rc2l)</code></pre
 ##     class(object) &lt;- unique(c(pdClass, &quot;pdMat&quot;))
 ##     pdConstruct(object, value, form, nam, data)
 ## }
-## &lt;bytecode: 0x000000001e703e90&gt;
+## &lt;bytecode: 0x000000001bb04940&gt;
 ## &lt;environment: namespace:nlme&gt;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">pdFactorfull &lt;-<span class="st"> </span>function (object) 
 {

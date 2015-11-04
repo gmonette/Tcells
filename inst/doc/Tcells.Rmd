@@ -11,6 +11,18 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+## Life and death cell processes TODO TODO 
+
+Is this a link to Plans: [link to Plans](Plans.html)
+
+Suppose that the population of a particular type of cell develops through a birth and death Poisson process in which each has probability $\beta$ or reproducing and a probability $\delta$ of dying in one unit of time. Assume that the unit is sufficiently small, hence also $\beta$ and $\delta$, that the two processes can be treated as independent. Let $X_0$ be the number of cells at time 0 and consider small increments of time $t_1$, $t_2$ and $t_3$. Let $d_1$, $d_2$, $d_3$ be the changes in the number of cells from time 0 to time $t_1$, from time $t_1$ to time $t_1 + t_2$ and from time $t_1 + t_2$ to time $t_1 + t_2 + t_3$ respectively.
+
+**Continue with "eqn limiting distribution of cell in ....."
+and formulas in photo (check consistency)**
+
+
+
+
 ## Model for T-cell dynamics
 
 Subjects are observed at a number of occasions at different times. On each occasion the densities of cells of five different types are recorded.
@@ -121,7 +133,6 @@ and the variance-covariance matrix is
   \lambda &{{\delta _N}{N_t}}&{{\psi _N}{N_t}}&{{\delta _S}{S_t}}&{{\psi _S}{S_t}}&{{\delta _C}{C_t}}&{{\psi _C}{C_t}}&{{\delta _T}{T_t}}&{{\psi _T}{T_t}}&{{\delta _E}{E_t}} 
 \end{array}} \right)} \right]A'\]
 
-
 \[ = \left[ {\begin{array}{*{20}{c}}
   {\lambda  + {N_t}\left( {{\delta _N} + {\psi _N}} \right)}&{ - {\psi _N}{N_t}}&0&0&0 \\ 
   { - {\psi _N}{N_t}}&{{\psi _N}{N_t} + {S_t}\left( {{\delta _S} + {\psi _S}} \right)}&{ - {\psi _S}{S_t}}&0&0 \\ 
@@ -132,11 +143,68 @@ and the variance-covariance matrix is
 
 This formulation of the model allows an unconstrained parametrization by using the log of each parameter, each of which is positive, as the actual working parameter for optimization.
 
-### Adjustment for cell densities from blood samples of different volumes
+### Equilibrium and stability conditions
 
-If the response variable is either a number of cells counted in a situation in which the volume of the sample from which cells are counted varies from observation to observation or if the response a cell density, i.e. number of cells observed divided by the volume of the sample examined, then the model above needs to be adjusted.
+\[E\left( {\Delta \left[ {\begin{array}{*{20}{c}}
+  {{N_{t + 1}}} \\ 
+  {{S_{t + 1}}} \\ 
+  {{C_{t + 1}}} \\ 
+  {{T_{t + 1}}} \\ 
+  {{E_{t + 1}}} 
+\end{array}} \right]} \right) = \left[ {\begin{array}{*{20}{c}}
+  {\lambda  - {\delta _N}{N_t} - {\psi _N}{N_t}} \\ 
+  {{\psi _N}{N_t} - {\delta _S}S - {\psi _S}{S_t}} \\ 
+  {{\psi _S}{S_t} - {\delta _C}{C_t} - {\psi _C}{C_t}} \\ 
+  {{\psi _C}{C_t} - {\delta _T}{T_t} - {\psi _T}{T_t}} \\ 
+  {{\psi _T}{T_t} - {\delta _E}{E_t}} 
+\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+  {\lambda  - {N_t}\left( {{\delta _N} + {\psi _N}} \right)} \\ 
+  {{\psi _N}{N_t} - {S_t}\left( {{\delta _S} + {\psi _S}} \right)} \\ 
+  {{\psi _S}{S_t} - {C_t}\left( {{\delta _C} + {\psi _C}} \right)} \\ 
+  {{\psi _C}{C_t} - {T_t}\left( {{\delta _T} + {\psi _T}} \right)} \\ 
+  {{\psi _T}{T_t} - {\delta _E}{E_t}} 
+\end{array}} \right] 
+\]
 
-Let $X_t, Y_t$ be cells densities observed in a smaple of volume $V_t$. Let $X_t^c, Y_t^c$ be the actual counts so that
+\[E\left( {\Delta \left[ {\begin{array}{*{20}{c}}
+  {{N_{t + 1}}} \\ 
+  {{S_{t + 1}}} \\ 
+  {{C_{t + 1}}} \\ 
+  {{T_{t + 1}}} \\ 
+  {{E_{t + 1}}} 
+\end{array}} \right]} \right) = \left[ {\begin{array}{*{20}{c}}
+  {\lambda  - {N_t}\left( {{\delta _N} + {\psi _N}} \right)} \\ 
+  {{\psi _N}{N_t} - {S_t}\left( {{\delta _S} + {\psi _S}} \right)} \\ 
+  {{\psi _S}{S_t} - {C_t}\left( {{\delta _C} + {\psi _C}} \right)} \\ 
+  {{\psi _C}{C_t} - {T_t}\left( {{\delta _T} + {\psi _T}} \right)} \\ 
+  {{\psi _T}{T_t} - {\delta _E}{E_t}} 
+\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+  \lambda &{ - \left( {{\delta _N} + {\psi _N}} \right)}&0&0&0&0 \\ 
+  0&{{\psi _N}}&{ - \left( {{\delta _S} + {\psi _S}} \right)}&0&0&0 \\ 
+  0&0&{{\psi _S}}&{ - \left( {{\delta _C} + {\psi _C}} \right)}&0&0 \\ 
+  0&0&0&{{\psi _C}}&{ - \left( {{\delta _T} + {\psi _T}} \right)}&0 \\ 
+  0&0&0&0&{{\psi _T}}&{ - {\delta _E}} 
+\end{array}} \right]\left[ {\begin{array}{*{20}{c}}
+  1 \\ 
+  {{N_t}} \\ 
+  {{S_t}} \\ 
+  {{C_t}} \\ 
+  {{T_t}} \\ 
+  {{E_t}} 
+\end{array}} \right]\]
+
+
+
+
+
+
+
+
+### Adjustment for cell concentrations from blood samples of different volumes
+
+If the response variable is either a number of cells counted in a situation in which the volume of the sample from which cells are counted varies from observation to observation or if the response is a cell concentration, i.e. number of cells observed divided by the volume of the sample examined, then the model above needs to be adjusted.
+
+Let $X_t, Y_t$ be cells concentrations observed in a smaple of volume $V_t$. Let $X_t^c, Y_t^c$ be the actual counts so that
 \[\left( {\begin{array}{*{20}{c}}
   {{X_t}} \\ 
   {{Y_t}} 
@@ -166,12 +234,12 @@ $\frac{1}{{{V_t}}}\left( {\begin{array}{*{20}{c}}
 \end{array}} \right]$, respectively.
 
 Thus, blood sample volumes that vary between measurements can be taken into account but need to be incorporated into the model.
-Simply standardizing by, for example, multiplying the densities
+Simply standardizing by, for example, multiplying the concentrations
 so they refer to a common volume will not work since the resulting
 relationship between the expectation and the variance of the
 response variables will not be that obtained above assuming Poisson components.
 
-If the measurements are cell densities that are always obtained from the same blood volume, then the easiest approch is to multiply each obervation by the common value of $V$ which will yield the cell counts modeled as discussed in the previous sections. 
+If the measurements are cell concentrations that are always obtained from the same blood volume, then the easiest approch is to multiply each obervation by the common value of $V$ which will yield the cell counts modeled as discussed in the previous sections. 
 
 ## Using mixed models
 

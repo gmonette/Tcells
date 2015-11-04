@@ -1,46 +1,83 @@
+#' Utility function
+#' 
+#' Utility function to debug
+#' 
+#' @export
+disp <-
+function (x, head = deparse(substitute(x))) 
+{
+  cat("\n::: ", head, " :::\n")
+  print(x)
+}
 #' Constuctor for Positive-Definite Matrix With Zero Covariances Between Predictor Random Effects
 #' 
-#' TODO: add block diagonal covariances for, e.g. 3+-level factors.
-#' 
 #' This function is a constructor for the \code{pdInd} class, representing a positive-definite matrix with zero covariances except possibly in the first row and column. If the matrix associated with \code{object} is of dimension $n$, it is represented by $n + (n-1)$ unrestricted parameters representing a lower-triangular log-Cholesky decomposition. The first $n$ parameters are the logs of the diagonal elements of the matrix and the last $n-1$ components are the $n-1$ remaining elements of the lower-triangular decomposition corresponding the to the possibly non-zero covariances in the first row.
+#' @param value an option initialization value, which can be any of the
+#'   following ...
+#' @param form an optional one-sided linear formula specifying 
+#'   the row/column names for the matrix represented by \code{object}.
+#' @param nam and optional vector of character strings specifying 
+#'   the row/column names for the matrix represented by \code{object}.
+#' @param data and optional data frame i which to evaluate 
+#'   the variables names in \code{value} and \code{form}. ...
+#' @param cov optional position in lower triangle of 
+#'   covariances that are estimated and, thus, possibly non-zero. 
+#'   The default is that the covariances in the first column 
+#'   are estimated and possibly non-zero. 
+#' @param zero optional way of specifying covariances constrained 
+#'   to be equal to zero. Only the lower triangular portion of 
+#'   the \code{zero} is used. The elements that are equal to 0 
+#'   corresponds to the pattern of elements that are constrained 
+#'   to zero in the covariance matrix.
+#' @section CAUTION:
+#' cov and zero do not work.
 #' @export
 pdInd <-
-  function (value = numeric(0), form = NULL, nam = NULL, data = sys.parent(), cov = NULL) 
+  function (value = numeric(0), form = NULL, nam = NULL, 
+            data = sys.parent(), cov = NULL, zero = NULL) 
 {
-  # unchanged  
+ # unchanged  
  object <- numeric(0)
  class(object) <- c("pdInd", "pdMat")
- pdConstruct(object, value, form, nam, data, cov)
+ pdConstruct(object, value, form, nam, data, cov, zero)
 }
-
 #' Construct pdInd object
 #' 
-#' This function is a constructor for a pdInd object.
+#' This function is a constructor for a \link{\code{pdInd}} object.
 #' 
 #' @param object an object inheriting from the class \code{pdInd}, representing a positive definite matrix with zero covariances except in the first row and column.
-#' @param value and option initialization value, which can be any of the following ...
-#' @param form an optional one-sided linear formula specifying the row/column names for the matrix represented by \code{object}.
-#' @param nam and optional vector of character strings specifying the row/column names for the matrix represented by \code{object}.
-#' @param data and optional data frame i which to evaluate the variables names in \code{value} and \code{form}. ...
-#' @param cov optional position in lower triangle of covariances that are estimated and, thus, possibly non-zero. The default is that the covariances in the first column are estimated and possibly non-zero. 
+#' @inheritParams Tcells::pdInd
 #' @export
 pdConstruct.pdInd <-
   function (object, value = numeric(0), form = formula(object), 
-         nam = Names(object), data = sys.parent(), cov = NULL, ...) 
+         nam = Names(object), data = sys.parent(), 
+         cov = NULL, zero = NULL,...) 
 {
-    # note that pdConstruct.pdMat return an upper-triangular R factor, i.e. chol(value)
-  val <- nlme:::pdConstruct.pdMat(object, value = value, form = form, nam = nam, data = data)
+  # note that pdConstruct.pdMat return an upper-triangular R factor, 
+  # i.e. chol(value)
+  val <- nlme:::pdConstruct.pdMat(object, value = value, 
+                                  form = form, nam = nam, data = data)
   if (length(val) == 0) {
     class(val) <- c("pdInd", "pdMat")
     return(val)
   }
-  # mod 2015 07 04: add arbitrary cov structure of non zero 
+  # mod 2015 07 04: added arbitrary cov structure of non zero 
   # covariance
   isRmat <- function(x) all( x[row(x) > col(x)] == 0)
+#  disp(zero)
+#  disp(cov) 
   if (is.matrix(val)) {
-    if( is.null(cov)) cov <- (row(val) == 1) & (col(val) > 1)
-    if( isRmat(val) ){
-      value <- c(log(diag(val)), val[cov])    # keeping only the entries that should be non-zero
+    if(!is.null(zero)) {
+      zero <- zero == 0
+      zero[col(zero) >= row(zero)] <- FALSE
+      cov <- t(zero)
+#      disp(cov)
+    }
+    if(is.null(cov)) cov <- (row(val) == 1) & (col(val) > 1)
+#    disp(cov)
+    if(isRmat(val) ){
+      value <- c(log(diag(val)), val[cov])    
+          # keeping only the entries that should be non-zero
     } else stop("matrix should be an upper triangular matrix")
     attributes(value) <- 
       attributes(val)[names(attributes(val)) != "dim"]

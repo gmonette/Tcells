@@ -1,15 +1,614 @@
 ---
 title: "T-cell dynamics"
 author: "GM + ?"
-date: "`r Sys.Date()`"
+date: "`r Sys.time()`"
 output: 
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{T-cell dynamics}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
+
+
+
+## Replication and death cell processes
+
+We develop a stochastic model for the changes in cell counts from birth and death processes and we then work out the first and second moments for the resulting distribution of cell concentrations.
+
+Eventually, we want to work with a model with different types of cells and transitions from one cell type to another. At first, we consider only one cell population whose numbers evolve following a simple replication and death process.
+
+Letting $X_t$ be the number of cells at time $t$:
+
+$$X_{t+1} = X_t + R_t - D_t$$
+
+where 
+$D_t \sim \text{Poisson}(\rho X_t|X_t)$ and 
+$B_t \sim \text{Poisson}(\delta X_t|X_t)$ assumed to be 
+independent.
+
+The observed concentrations, $C_t$, are obtained from a sampled volume $v$ from the total volume $V$. Thus, 
+
+$$C_t | X_t \sim \text{Poisson}(\frac{v}{V}X_t)$$
+
+Let $c_t$ be the change from time $t$ to $t+1$. We are interested in the approximate distribution of a sequence, $c_{t_1}, c_{t_2}, ...$ as a function of the parameters.
+
+We start by deriving the first and second moments of the population process from which we can obtain the first and second moments of the concentration process.
+
+### First moments of cell population process
+
+First note a simple recursion formula:
+\[\begin{aligned}
+  E\left( {{X_{t + 1}}|{X_0}, \ldots ,{X_t}} \right) =  & {X_t} + E\left( {{R_t} - {D_t}|{X_0}, \ldots ,{X_t}} \right) \\ 
+   =  & {X_t}\left( {1 + \rho  - \delta } \right) \\ 
+   =  & E\left( {{X_{t + 1}}|{X_t}} \right) \\ 
+\end{aligned} \]
+
+from which for $k \geqslant l$:
+
+\[E({X_k}|{X_0}, \ldots ,{X_l}) =  {X_l}{\left( {1 + \rho  - \delta } \right)^{k - l}} = E({X_k}|{X_l})\]
+
+and:
+
+\[E\left( {{X_t}|{X_0}} \right) = {X_0}{\left( {1 + \rho  - \delta } \right)^t}\]
+
+**TODO: Proof by induction**
+
+### Second moments of cell population process
+
+First note that:
+
+$$
+  \operatorname{var} \left( {{R_t} - {B_t}|{X_0}, \ldots ,{X_t}} \right) = \left( {\rho  + \delta } \right){X_t} = \operatorname{var} \left( {{R_t} - {B_t}|{X_t}} \right) 
+$$
+and
+$$
+\operatorname{E} \left( {{{\left( {{R_t} - {B_t}} \right)}^2}|{X_0}, \ldots ,{X_t}} \right) = \left( {\rho  + \delta } \right){X_t} + {\left( {\rho  - \delta } \right)^2}X_t^2 = \operatorname{E} \left( {{{\left( {{R_t} - {B_t}} \right)}^2}|{X_t}} \right) 
+$$  
+
+For $k \geqslant l$:
+
+\[\begin{aligned}
+  E({X_k}{X_l}|{X_0}) =  & E(E({X_k}{X_l}|{X_l},{X_0})|{X_0}) \\ 
+   =  & E(E({X_k}|{X_l},{X_0}){X_l}|{X_0}) \\ 
+   =  & {\left( {1 + \rho  - \delta } \right)^{k - l}}E(X_l^2|{X_0}) \\ 
+   \\ 
+\end{aligned} \]
+
+and
+\[\begin{aligned}
+  \operatorname{E} \left( {X_{t + 1}^2|{X_0}, \ldots ,{X_t}} \right) =  & \operatorname{E} \left( {{{\left( {{X_t} + {R_t} - {D_t}} \right)}^2}|{X_t}} \right) \\ 
+   =  & \operatorname{E} \left( {X_t^2 + 2{X_t}\left( {{R_t} - {D_t}} \right) + {{\left( {{R_t} - {D_t}} \right)}^2}|{X_t}} \right) \\ 
+   =  & X_t^2 + 2{X_t}\operatorname{E} \left( {{R_t} - {D_t}|{X_t}} \right) + \operatorname{E} \left( {{{\left( {{R_t} - {D_t}} \right)}^2}|{X_t}} \right) \\ 
+   =  & X_t^2 + 2{X_t}\operatorname{E} \left( {{R_t} - {D_t}|{X_t}} \right) +  \operatorname{var} \left( {{R_t} - {D_t}|{X_t}} \right) + \operatorname{E} {\left( {{R_t} - {D_t}|{X_t}} \right)^2} \\ 
+   =  & X_t^2 + 2{X_t}{X_t}\left( {\rho  - \delta } \right) + {X_t}\left( {\rho  + \delta } \right) + X_t^2{\left( {\rho  - \delta } \right)^2} \\ 
+   =  & X_t^2{\left( {1 + \rho  - \beta } \right)^2} + {X_t}\left( {\rho  + \delta } \right) \\ 
+\end{aligned} \]
+
+Taking two steps:
+
+\[\begin{aligned}
+  \operatorname{E} \left( {X_{t + 2}^2|{X_t}} \right) =  & \operatorname{E} \left( {\operatorname{E} \left( {X_{t + 2}^2|{X_{t + 1}}} \right)|{X_t}} \right) \\ 
+   =  & \operatorname{E} \left( {X_{t + 1}^2{{\left( {1 + \rho  - \delta } \right)}^2} + X_{t + 1}^{}\left( {\rho  + \delta } \right)|{X_t}} \right) \\ 
+   =  & \operatorname{E} \left( {X_{t + 1}^2|{X_t}} \right){\left( {1 + \beta  - \delta } \right)^2} + \operatorname{E} \left( {X_{t + 1}^{}|{X_t}} \right)\left( {\rho  + \delta } \right) \\ 
+   =  & \left( {X_t^2{{\left( {1 + \rho  - \delta } \right)}^2} + {X_t}\left( {\rho  + \delta } \right)} \right){\left( {1 + \rho  - \delta } \right)^2} + {X_t}\left( {1 + \rho  - \delta } \right)\left( {\rho  + \delta } \right) \\ 
+   =  & X_t^2{\left( {1 + \rho  - \delta } \right)^4} + {X_t}\left( {\left( {\rho  + \delta } \right){{\left( {1 + \rho  - \delta } \right)}^2} + \left( {1 + \rho  - \delta } \right)\left( {\rho  + \delta } \right)} \right) \\ 
+   =  & X_t^2{\left( {1 + \rho  - \delta } \right)^4} + {X_t}\left( {\rho  + \delta } \right)\left( {{{\left( {1 + \beta  - \delta } \right)}^2} + \left( {1 + \rho  - \delta } \right)} \right) \\ 
+\end{aligned} \]
+
+Taking three steps:
+
+\[\begin{aligned}
+  \operatorname{E} \left( {X_t^2|{X_{t - 3}}} \right) =  & \operatorname{E} \left( {\operatorname{E} \left( {X_t^2|{X_{t - 2}}} \right)|{X_{t - 3}}} \right) \\ 
+   =  & \operatorname{E} \left( {X_{t - 2}^2{{\left( {1 + \rho  - \delta } \right)}^4} + {X_{t - 2}}\left( {\rho  + \delta } \right)\left( {{{\left( {1 + \rho  - \delta } \right)}^2} + \left( {1 + \rho  - \delta } \right)} \right)|{X_{t - 3}}} \right) \\ 
+   =  & {\left( {1 + \rho  - \delta } \right)^4}\left( {X_{t - 3}^2{{\left( {1 + \rho  - \delta } \right)}^2} + {X_{t - 3}}\left( {\rho  + \delta } \right)} \right) \\ 
+   &  + {X_{t - 3}}(1 + \rho  - \delta )\left( {\rho  + \delta } \right)\left( {{{\left( {1 + \rho  - \delta } \right)}^2} + \left( {1 + \rho  - \delta } \right)} \right) \\ 
+   =  & X_{t - 3}^2{\left( {1 + \rho  - \delta } \right)^6} + {X_{t - 3}}\left( {\rho  + \delta } \right)\left\{ {{{\left( {1 + \rho  - \delta } \right)}^4} + {{\left( {1 + \rho  - \delta } \right)}^3} + {{\left( {1 + \rho  - \delta } \right)}^2}} \right\} \\ 
+\end{aligned} \]
+
+Letting $\phi = 1+\rho-\delta$, for \[k \leqslant t\]:
+
+\[
+  \operatorname{E} \left( {X_t^2|{X_{t - k}}} \right) =   X_{t - k}^2{\phi ^{2k}} + {X_{t - k}}\left( {\rho  + \delta } \right)\left( {{\phi ^{k - 1}} +  \cdots  + {\phi ^{2(k - 1)}}} \right)
+\]
+
+With $k = t$, we get:
+
+\[\operatorname{E} \left( {X_t^2|{X_0}} \right) =   X_0^2{\phi ^{2k}} + {X_0}\left( {\rho  + \delta } \right)\left( {{\phi ^{t - 1}} +  \cdots  + {\phi ^{2(t - 1)}}} \right)\]
+
+Thus:
+
+\[\begin{aligned}
+  \operatorname{var} \left( {{X_t}|{X_0}} \right) =  & \operatorname{E} \left( {X_t^2|{X_0}} \right) - \operatorname{E} {\left( {X_t^{}|{X_0}} \right)^2} \\ 
+   =  & X_0^2{\phi ^{2k}} + {X_0}\left( {\rho  + \delta } \right)\left( {{\phi ^{t - 1}} +  \cdots  + {\phi ^{2(t - 1)}}} \right) - {\left( {{X_0}{\phi ^k}} \right)^2} \\ 
+   =  & {X_0}\left( {\rho  + \delta } \right)\left( {{\phi ^{t - 1}} +  \cdots  + {\phi ^{2(t - 1)}}} \right) \\ 
+\end{aligned} \]
+
+\[\begin{aligned}
+  \operatorname{var} \left( {{X_t}|{X_0}} \right) =  & \operatorname{E} \left( {X_t^2|{X_0}} \right) - \operatorname{E} {\left( {X_t^{}|{X_0}} \right)^2} \\ 
+   =  & X_0^2{\phi ^{2k}} + {X_0}\left( {\rho  + \delta } \right)\left( {{\phi ^{t - 1}} +  \cdots  + {\phi ^{2(t - 1)}}} \right) - {\left( {{X_0}{\phi ^k}} \right)^2} \\ 
+   =  & {X_0}\left( {\rho  + \delta } \right)\underbrace {\left( {{\phi ^{t - 1}} +  \cdots  + {\phi ^{2(t - 1)}}} \right)}_{t{\text{ terms}}} \\ 
+\end{aligned} \]
+
+Note that we could reexpress the last term in the equation above but the familiar formula for a geometric progression fails if $\phi=1$, a very plausible value here.
+
+To obtain covariances, consider, for $k \ge l$:
+
+\[\begin{aligned}
+  E({X_k}{X_l}|{X_0}) =  & E(E({X_k}{X_l}|{X_l},{X_0})|{X_0}) \\ 
+   =  & E(E({X_k}|{X_l},{X_0}){X_l}|{X_0}) \\ 
+   =  & {\left( {1 + \beta  - \delta } \right)^{k - l}}E(X_l^2|{X_0}) \\ 
+\end{aligned} \]
+
+and
+
+\[\begin{aligned}
+  \operatorname{cov} ({X_k},{X_l}|{X_0}) =  & E({X_k}{X_l}|{X_0}) - E({X_k}|{X_0})E({X_l}|{X_0}) \\ 
+   =  & {\phi ^{k - l}}E(X_l^2|{X_0}) - {X_0}{\phi ^k}{X_0}{\phi ^l} \\ 
+   =  & {\phi ^{k - l}}\left( {X_0^2{\phi ^{2l}} + {X_0}\left( {\rho  + \delta } \right)\left( {{\phi ^{l - 1}} + {\phi ^l} +  \cdots  + {\phi ^{2(l - 1)}}} \right)} \right) - X_0^2{\phi ^{k + l}} \\ 
+   =  & {\phi ^{k - l}}X_0^2{\phi ^{2l}} - X_0^2{\phi ^{k + l}} + {\phi ^{k - l}}{X_0}\left( {\rho  + \delta } \right)\left( {{\phi ^{l - 1}} + {\phi ^l} +  \cdots  + {\phi ^{2(l - 1)}}} \right) \\ 
+   =  & {X_0}\left( {\rho  + \delta } \right)\left( {{\phi ^{l - 1 + k - l}} + {\phi ^{l + k - l}} +  \cdots  + {\phi ^{2(l - 1) + k - l}}} \right) \\ 
+   =  & {X_0}\left( {\rho  + \delta } \right)\underbrace {\left( {{\phi ^{k - 1}} + {\phi ^k} +  \cdots  + {\phi ^{k - 1 + l - 1}}} \right)}_{l{\text{ terms}}} \\ 
+\end{aligned} \]
+
+which we note is consistent with the previous formula for variance.
+
+The mean and variance for $X_1,X_2,X_3,X_4$ are:
+
+\[\begin{aligned}
+  \operatorname{E} \left( {\left[ {\begin{array}{*{20}{c}}
+  {{X_1}} \\ 
+  {{X_2}} \\ 
+  {{X_3}} \\ 
+  {{X_4}} 
+\end{array}} \right]|{X_0}} \right) =  & {X_0}\left[ {\begin{array}{*{20}{c}}
+  {{\phi ^1}} \\ 
+  {{\phi ^2}} \\ 
+  {{\phi ^3}} \\ 
+  {{\phi ^4}} 
+\end{array}} \right] \\ 
+   \\ 
+  \operatorname{Var} \left( {\left[ {\begin{array}{*{20}{c}}
+  {{X_1}} \\ 
+  {{X_2}} \\ 
+  {{X_3}} \\ 
+  {{X_4}} 
+\end{array}} \right]|{X_0}} \right) =  & {X_0}\left( {\rho  + \delta } \right)\left[ {\begin{array}{*{20}{c}}
+  {{\phi ^0}}&{{\phi ^1}}&{{\phi ^2}}&{{\phi ^3}} \\ 
+  {}&{{\phi ^1} + {\phi ^2}}&{{\phi ^2} + {\phi ^3}}&{{\phi ^3} + {\phi ^4}} \\ 
+  {}&{}&{{\phi ^2} + {\phi ^3} + {\phi ^4}}&{{\phi ^3} + {\phi ^4} + {\phi ^5}} \\ 
+  {}&{}&{}&{{\phi ^3} + {\phi ^4} + {\phi ^5} + {\phi ^6}} 
+\end{array}} \right] \\ 
+\end{aligned} \]
+
+## Varying time intervals
+
+We now derive formulas that can be used when there are time intervals of varying lengths. We shift the notation slightly and use $i$ as an index so that $X_i$ denotes the cell count at time
+$T_i$. Thus,
+
+$$X_{i+1} = X_i + R_i - D_i$$
+
+with observations made at times $T_0 = 0, T_1, T_2, ...$. Let $t_i = T_{i+1} - T_i$ be the elapsed time between observations.
+
+The expected number of replications and deaths depends on the elapsed time so that ${R_i} \sim {\text{Poisson}}\left( {\rho {t_i}{X_i}} \right)$ and ${D_i} \sim {\text{Poisson}}\left( {\delta {t_i}{X_i}} \right)$.
+
+### First moments
+
+\[\begin{aligned}
+  \operatorname{E} \left( {{X_{i + 1}}|{X_0}, \ldots ,{X_i}} \right) =  & {X_i} + \operatorname{E} \left( {{R_i} - {D_i}|{X_0}, \ldots ,{X_i}} \right) \\ 
+   =  & {X_i}\left( {1 + {t_i}\left( {\rho  - \delta } \right)} \right) \\ 
+   =  & \operatorname{E} \left( {{X_{i + 1}}|{X_i}} \right) \\ 
+\end{aligned} \]
+
+Letting ${\phi _i} = 1 + {t_i}\left( {\rho  - \delta } \right)$, for $k \geqslant l$:
+
+\[\operatorname{E} \left( {{X_k}|{X_l}} \right) = {X_l}\prod\limits_{i = l + 1}^k {\left( {1 + {t_i}\left( {\rho  - \delta } \right)} \right)}  = {X_l}\prod\limits_{i = l + 1}^k {{\phi _i}} \]
+
+and
+
+\[\operatorname{E} \left( {{X_k}|{X_0}} \right) = {X_0}\prod\limits_{i = 1}^k {\left( {1 + {t_i}\left( {\rho  - \delta } \right)} \right)}  = {X_0}\prod\limits_{i = 1}^k {{\phi _i}} \]
+
+### Second moments
+
+We attack the problem as follows. In essence, we need to fill out the terms of a variance-covariance matrix for $X_0,X_1,X_2, ...$. 
+
+We find:
+
+1. An expression for the conditional variance for one step, which we use to obtain
+2. a recursive formula for the conditional expected square of $X_t$, from which we
+3. derive a general formula.
+
+This allows us to fill in the diagonal of the variance-covariance matrix. To fill in the covariance, we then find an expression for conditional expectations of products. 
+
+Starting with:
+
+\[\operatorname{var} \left( {{R_i} - {D_i}|{X_0}, \ldots ,{X_i}} \right) = {X_i}{t_i}\left( {\rho  + \delta } \right)\]
+
+we derive a recursion for the expected value of the square of $X_i$.
+
+\[\begin{aligned}
+  \operatorname{E} \left( {X_i^2|{X_0}, \ldots ,{X_{i - 1}}} \right) =  & \operatorname{E} \left( {{{\left( {{X_{i - 1}} + {R_{i - 1}} - {D_{i - 1}}} \right)}^2}|{X_{i - 1}}} \right) \\ 
+   =  & X_{i - 1}^2 + 2{X_{i - 1}}\operatorname{E} \left( {{R_{i - 1}} - {D_{i - 1}}|{X_{i - 1}}} \right) + \operatorname{E} \left( {{{\left( {{R_{i - 1}} - {D_{i - 1}}} \right)}^2}|{X_{i - 1}}} \right) \\ 
+   =  & X_{i - 1}^2 + 2{X_{i - 1}}{t_{i - 1}}{X_{i - 1}}\left( {\rho  - \delta } \right) + \operatorname{var} \left( {{R_{i - 1}} - {D_{i - 1}}|{X_{i - 1}}} \right) + \operatorname{E} {\left( {{R_{i - 1}} - {D_{i - 1}}|{X_{i - 1}}} \right)^2} \\ 
+   =  & X_{i - 1}^2 + 2X_{i - 1}^2{t_{i - 1}}\left( {\rho  - \delta } \right) + {X_{i - 1}}{t_{i - 1}}\left( {\rho  + \delta } \right) + {\left( {{X_{i - 1}}{t_{i - 1}}\left( {\rho  + \delta } \right)} \right)^2} \\ 
+   =  & X_{i - 1}^2\left( {1 + 2{t_{i - 1}}\left( {\rho  - \delta } \right) + t_{i - 1}^2{{\left( {\rho  - \delta } \right)}^2}} \right) + \left( {\rho  + \delta } \right){X_{i - 1}}{t_{i - 1}} \\ 
+   =  & X_{i - 1}^2\phi _{i - 1}^2 + \left( {\rho  + \delta } \right){X_{i - 1}}{t_{i - 1}} \\ 
+\end{aligned} \]
+
+\[\begin{aligned}
+  \operatorname{E} \left( {X_i^2|{X_0}, \ldots ,{X_{i - 2}}} \right) =  & \operatorname{E} \left( {\operatorname{E} \left( {X_i^2|{X_{i - 1}}} \right)|{X_0}, \ldots ,{X_{i - 2}}} \right) \\ 
+   =  & \operatorname{E} \left( {X_{i - 1}^2\phi _{i - 1}^2 + \left( {\rho  + \delta } \right){X_{i - 1}}{t_{i - 1}}|{X_0}, \ldots ,{X_{i - 2}}} \right) \\ 
+   =  & \phi _{i - 1}^2\operatorname{E} \left( {X_{i - 1}^2|{X_0}, \ldots ,{X_{i - 2}}} \right) + \operatorname{E} \left( {\left( {\rho  + \delta } \right){X_{i - 1}}{t_{i - 1}}|{X_0}, \ldots ,{X_{i - 2}}} \right) \\ 
+   =  & \phi _{i - 1}^2\left\{ {X_{i - 2}^2\phi _{i - 2}^2 + \left( {\rho  + \delta } \right){X_{i - 2}}{t_{i - 2}}} \right\} + \left( {\rho  + \delta } \right){t_{i - 1}}{\phi _{i - 2}}{X_{i - 2}} \\ 
+   =  & \phi _{i - 1}^2\phi _{i - 2}^2X_{i - 2}^2 + \left( {\rho  + \delta } \right){X_{i - 2}}\left\{ {\phi _{i - 1}^2{t_{i - 2}} + {t_{i - 1}}{\phi _{i - 2}}} \right\} \\ 
+\end{aligned} \]
+
+\[\begin{aligned}
+  \operatorname{E} \left( {X_i^2|{X_0}, \ldots ,{X_{i - 3}}} \right) =  & \operatorname{E} \left( {\operatorname{E} \left( {X_i^2|{X_{i - 2}}} \right)|{X_0}, \ldots ,{X_{i - 3}}} \right) \\ 
+   =  & \operatorname{E} \left( {\phi _{i - 1}^2\phi _{i - 2}^2X_{i - 2}^2 + \left( {\rho  + \delta } \right){X_{i - 2}}\left\{ {\phi _{i - 1}^2{t_{i - 2}} + {\phi _{i - 2}}{t_{i - 1}}} \right\}|{X_0}, \ldots ,{X_{i - 3}}} \right) \\ 
+   =  & \phi _{i - 1}^2\phi _{i - 2}^2\operatorname{E} \left( {X_{i - 2}^2|{X_{i - 3}}} \right) + \left( {\rho  + \delta } \right)\left\{ {\phi _{i - 1}^2{t_{i - 2}} + {\phi _{i - 2}}{t_{i - 1}}} \right\}\operatorname{E} \left( {{X_{i - 2}}|{X_{i - 3}}} \right) \\ 
+   =  & \phi _{i - 1}^2\phi _{i - 2}^2\phi _{i - 3}^2X_{i - 3}^2 + \phi _{i - 1}^2\phi _{i - 2}^2\left( {\rho  + \delta } \right){X_{i - 3}}{t_{i - 3}} + \left( {\rho  + \delta } \right)\left\{ {\phi _{i - 1}^2{t_{i - 2}} + {\phi _{i - 2}}{t_{i - 1}}} \right\}{\phi _{i - 3}}{X_{i - 3}} \\ 
+   =  & \phi _{i - 1}^2\phi _{i - 2}^2\phi _{i - 3}^2X_{i - 3}^2 + \left( {\rho  + \delta } \right){X_{i - 3}}\left[ {\phi _{i - 1}^2\phi _{i - 2}^2{t_{i - 3}} + {\phi _{i - 3}}\left\{ {\phi _{i - 1}^2{t_{i - 2}} + {\phi _{i - 2}}{t_{i - 1}}} \right\}} \right] \\ 
+\end{aligned} \]
+
+Deriving a programmable formula:
+
+\[\operatorname{E} \left( {X_i^2|{X_0}, \ldots ,{X_{i - k}}} \right) = \prod\limits_{j = 1}^k {\phi _{i - j}^2X_{i - k}^2}  + \left( {\rho  + \delta } \right){X_{i - k}}{P_{i,k}}\]
+
+where $P_{i,k}$ is defined iteratively for $k \leq i$:
+
+\[\begin{aligned}
+     P_{1,1} = & 1 \\
+   {P_{i,1}} = & {t_{i - 1}} \\ 
+  P_{i,k}^{} = & \left( {\prod\limits_{j = 1}^{k - 1} {\phi _{i - j}^2} } \right){t_{i - k}} + {\phi _{i - k}}{P_{i,k - 1}} \\ 
+\end{aligned} \]
+
+Expressed differently, for $k > m$:
+
+\[\operatorname{E} \left( {X_k^2|{X_m}} \right) = \left( {\prod\limits_{j = m}^{k - 1} {\phi _j^2} } \right)X_m^2 + \left( {\rho  + \delta } \right){X_m}{P_{k,m - k}}\]
+
+Thus the variance is:
+
+\[\begin{aligned}
+  \operatorname{var} \left( {X_i|{X_{i - k}}} \right) =  & \operatorname{E} \left( {X_i^2|{X_{i - k}}} \right) - \operatorname{E} {\left( {X_i^{}|{X_{i - k}}} \right)^2} \\ 
+   =  & \left( {\prod\limits_{j = 1}^k {\phi _{i - j}^2} } \right)X_{i - k}^2 + \left( {\rho  + \delta } \right){X_{i - k}}{P_{i,k}} - {\left( {\left( {\prod\limits_{j = 1}^k {\phi _{i - j}^{}} } \right)X_{i - k}^{}} \right)^2} \\ 
+   =  & \left( {\rho  + \delta } \right){X_{i - k}}{P_{i,k}} \\ 
+\end{aligned} \]
+
+and
+
+\[\operatorname{var} \left( {X_i^2|{X_0}} \right) =  \left( {\rho  + \delta } \right){X_0}{P_{i,i}}\]
+
+To get covariances, for $k > l > m$:
+
+\[\begin{aligned}
+  \operatorname{E} ({X_k}{X_l}|{X_m}) =  & \operatorname{E} (\operatorname{E} \left( {{X_k}{X_l}|{X_l}} \right)|{X_m}) \\ 
+   =  & \operatorname{E} (\operatorname{E} \left( {{X_k}|{X_l}} \right){X_l}|{X_m}) \\ 
+   =  & \left( {\prod\limits_{j = l}^{k - 1} {\phi _j^{}} } \right)\operatorname{E} \left( {X_l^2|{X_m}} \right) \\ 
+\end{aligned} \]
+
+Thus:
+
+\[\operatorname{E} \left( {X_k^2|{X_m}} \right) = \left( {\prod\limits_{j = m}^{k - 1} {\phi _j^2} } \right)X_m^2 + \left( {\rho  + \delta } \right){X_m}{P_{k,k-m}}\]
+
+and 
+
+\[\begin{aligned}
+  \operatorname{E} \left( {{X_k}{X_l}|{X_m}} \right) =  & \operatorname{E} \left( {\operatorname{E} \left( {{X_k}{X_l}|{X_l}} \right)|{X_m}} \right) \\ 
+   =  & \operatorname{E} \left( {\operatorname{E} \left( {{X_k}|{X_l}} \right){X_l}|{X_m}} \right) \\ 
+   =  & \operatorname{E} \left( {\left( {\prod\limits_{j = l}^{k - 1} {\phi _j^{}} } \right){X_l}{X_l}|{X_m}} \right) \\ 
+   =  & \left( {\prod\limits_{j = l}^{k - 1} {\phi _j^{}} } \right)\operatorname{E} \left( {X_l^2|{X_m}} \right) \\ 
+   =  & \left( {\prod\limits_{j = l}^{k - 1} {\phi _j^{}} } \right)\left( {\left( {\prod\limits_{j = m}^{l - 1} {\phi _j^2} } \right)X_m^2 + \left( {\rho  + \delta } \right){X_m}{P_{l,l - m}}} \right) \\ 
+\end{aligned} \]
+
+and
+
+\[\operatorname{E} \left( {{X_k}{X_l}|{X_0}} \right) = \left( {\prod\limits_{j = l}^{k - 1} {\phi _j^{}} } \right)\left( {\left( {\prod\limits_{j = 0}^{l - 1} {\phi _j^2} } \right)X_0^2 + \left( {\rho  + \delta } \right){X_0}{P_{l,l}}} \right)\]
+
+which yields the following expression for the covariance:
+
+\[\begin{aligned}
+  \operatorname{cov} \left( {{X_k},{X_l}|{X_0}} \right) =  & \operatorname{E} \left( {{X_k}{X_l}|{X_0}} \right) - \operatorname{E} \left( {{X_k}|{X_0}} \right)\operatorname{E} \left( {{X_l}|{X_0}} \right) &  \\ 
+   =  &  & \left( {\prod\limits_{j = l}^{k - 1} {\phi _j^{}} } \right)\left( {\left( {\prod\limits_{j = 0}^{l - 1} {\phi _j^2} } \right)X_0^2 + \left( {\rho  + \delta } \right){X_0}{P_{l,l}}} \right) - \left( {\prod\limits_{j = 0}^{k - 1} {\phi _j^{}} } \right)\left( {\prod\limits_{j = 0}^{l - 1} {\phi _j^{}} } \right)X_0^2 \\ 
+   =  & \left( {\prod\limits_{j = l}^{k - 1} {\phi _j^{}} } \right)\left( {\rho  + \delta } \right){X_0}{P_{l,l}} \\ 
+\end{aligned} \]
+
+Thus, the expectation and variance of $X_1, X_2, X_3, X_4$ is
+
+\[\begin{aligned}
+  \operatorname{E} \left( {\left[ {\begin{array}{*{20}{c}}
+  {{X_1}} \\ 
+  {{X_2}} \\ 
+  {{X_3}} \\ 
+  {{X_4}} 
+\end{array}} \right]|{X_0}} \right) =  & {X_0}\left[ {\begin{array}{*{20}{c}}
+  {{\phi _1}} \\ 
+  {{\phi _1}{\phi _2}} \\ 
+  {{\phi _1}{\phi _2}{\phi _3}} \\ 
+  {{\phi _1}{\phi _2}{\phi _3}{\phi _4}} 
+\end{array}} \right] \\ 
+  \operatorname{Var} \left( {\left[ {\begin{array}{*{20}{c}}
+  {{X_1}} \\ 
+  {{X_2}} \\ 
+  {{X_3}} \\ 
+  {{X_4}} 
+\end{array}} \right]|{X_0}} \right) =  & {X_0}\left( {\rho  + \delta } \right)\left[ {\begin{array}{*{20}{c}}
+  {{P_{1,1}}}&{{\phi _1}{P_{1,1}}}&{{\phi _1}{\phi _2}{P_{1,1}}}&{{\phi _1}{\phi _2}{\phi _3}{P_{1,1}}} \\ 
+  {}&{{P_{2,2}}}&{{\phi _2}{P_{2,2}}}&{{\phi _2}{\phi _3}{P_{2,2}}} \\ 
+  {}&{}&{{P_{3,3}}}&{{\phi _3}{P_{3,3}}} \\ 
+  {}&{}&{}&{{P_{4,4}}} 
+\end{array}} \right] \\ 
+\end{aligned} \]
+
+**Theorem: Prove the variance and covariance formulas by induction**
+
+#### Verify that variable interval case specializes to unit interval case
+
+This is a verification that the formulas above for the variance in the variable interval case specialize to the unit interval formulas.
+
+We have $\phi_i = \phi$. 
+
+\[\begin{aligned}
+  {P_{1,1}} =  & 1 \\ 
+  {P_{2,1}} =  & {t_1} = 1 \\ 
+  {P_{2,2}} =  & \phi _1^2{t_0} + {\phi _0}{P_{2,1}} = {\phi ^2} + \phi  \\ 
+  {P_{3,1}} =  & {t_2} = 1 \\ 
+  {P_{3,2}} =  & \phi _2^2{t_1} + {\phi _1}{P_{3,1}} = {\phi ^2} + \phi  \\ 
+  {P_{3,3}} =  & \phi _2^2\phi _1^2{t_0} + {\phi _0}{P_{3,2}} = {\phi ^4} + {\phi ^3} + {\phi ^2} \\ 
+  {P_{4,1}} =  & {t_3} = 1 \\ 
+  {P_{4,2}} =  & \phi _3^2{t_2} + {\phi _2}{P_{4,1}} = {\phi ^2} + \phi  \\ 
+  {P_{4,3}} =  & \phi _3^2\phi _2^2{t_1} + {\phi _1}{P_{4,2}} = {\phi ^4} + {\phi ^3} + {\phi ^2} \\ 
+  {P_{4,4}} =  & \phi _3^2\phi _2^2\phi _1^2{t_0} + {\phi _0}{P_{4,3}} = {\phi ^6} + {\phi ^5} + {\phi ^4} + {\phi ^3} \\ 
+\end{aligned} \]
+
+yielding
+
+\[\operatorname{Var} \left( {\left[ {\begin{array}{*{20}{c}}
+  {{X_1}} \\ 
+  {{X_2}} \\ 
+  {{X_3}} \\ 
+  {{X_4}} 
+\end{array}} \right]|{X_0}} \right) =  {X_0}\left( {\rho  + \delta } \right)\left[ {\begin{array}{*{20}{c}}
+  1&\phi &{{\phi ^2}}&{{\phi ^3}} \\ 
+  {}&{{\phi ^2} + \phi }&{{\phi ^3} + {\phi ^2}}&{{\phi ^4} + {\phi ^3}} \\ 
+  {}&{}&{{\phi ^4} + {\phi ^3} + {\phi ^2}}&{{\phi ^5} + {\phi ^4} + {\phi ^3}} \\ 
+  {}&{}&{}&{{\phi ^6} + {\phi ^5} + {\phi ^4} + {\phi ^3}} 
+\end{array}} \right]\]
+
+which corresponds to the result for unit intervals.
+
+## Model for concentrations
+
+Let $X_t, t = 0, 1, ...$ be the number of cells in a population over time with some probability distribution and let
+$C_t, t = 0, 1, ...$ be measured concentrations from a sampled volume $v$ from a total volume $V$.
+
+Conditional on the number of cells in the population, we can model the number of cells observed in the sample, $v C_t$ has having a Poisson distribution:
+
+Thus, \(v{C_t}|{X_t} \sim \operatorname{Poisson} (v{X_t}/V)\) with
+$\operatorname{E} \left( {v{C_t}|{X_t}} \right) =  \operatorname{var} \left( {v{C_t}|{X_t}} \right) = v{X_t}/V$. Thus,
+
+\[\begin{aligned}
+  \operatorname{E} \left( {{C_t}|{X_t}} \right) =  & {X_t}/V \\ 
+  \operatorname{var} \left( {{C_t}|{X_t}} \right) =  & \frac{1}{v}{X_t}/V \\ 
+  \operatorname{cov} \left( {C_k,C_l|{X_t,X_l}} \right) =  & 0 \text{  } k \neq l\\ 
+\end{aligned} \]
+
+Thus, letting 
+${\mathbf{C}} = {\left[ {\begin{array}{*{20}{c}}
+ {{C_0}}&{{C_1}}&{{C_2}}&{{C_3}} 
+\end{array}} \right]^\prime }$ 
+and 
+${\mathbf{X}} = {\left[ {\begin{array}{*{20}{c}}
+  {{X_0}}&{{X_1}}&{{X_2}}&{{X_3}} 
+\end{array}} \right]^\prime }$
+
+we have
+
+\[\operatorname{E} \left( {{\mathbf{C}}|{\mathbf{X}}} \right) = \frac{1}{V}{\mathbf{X}}\]
+
+and
+
+\[\operatorname{Var} \left( {{\mathbf{C}}|{\mathbf{X}}} \right) = \frac{1}{{vV}}diag\left( {\mathbf{X}} \right)\]
+
+Conditioning on $X_0$ we get:
+
+\[\operatorname{E} \left( {{\mathbf{C}}|{X_0}} \right) = \frac{1}{V}\operatorname{E} \left( {{\mathbf{X}}|{X_0}} \right)\]
+
+and 
+
+\[\begin{aligned}
+  \operatorname{Var} \left( {{\mathbf{C}}|{X_0}} \right) =  & \frac{1}{{vV}}diag\left( {\operatorname{E} \left( {{\mathbf{X}}|{X_0}} \right)} \right) + \operatorname{Var} \left( {\operatorname{E} \left( {{\mathbf{C}}|{\mathbf{X}}} \right)|{X_0}} \right) \\ 
+   =  & \frac{1}{{vV}}diag\left( {\operatorname{E} \left( {{\mathbf{X}}|{X_0}} \right)} \right) + \frac{1}{{{V^2}}}\operatorname{Var} \left( {{\mathbf{X}}|{X_0}} \right) \\ 
+   =  & \frac{{{X_0}}}{{vV}}\left[ {\begin{array}{*{20}{c}}
+  1&0&0&0 \\ 
+  0&\phi &0&0 \\ 
+  0&0&{{\phi ^2}}&0 \\ 
+  0&0&0&{{\phi ^3}} 
+\end{array}} \right] + \frac{{{X_0}}}{{{V^2}}}\left( {\rho  + \delta } \right)\left[ {\begin{array}{*{20}{c}}
+  0&0&0&0 \\ 
+  0&1&\phi &{{\phi ^2}} \\ 
+  0&\phi &{\phi  + {\phi ^2}}&{{\phi ^2} + {\phi ^3}} \\ 
+  0&{{\phi ^2}}&{{\phi ^2} + {\phi ^3}}&{{\phi ^2} + {\phi ^3} + {\phi ^4}} 
+\end{array}} \right] \\ 
+\end{aligned} \]
+
+Thus, if $V$ is relatively large and the parameters close to equilibrium so that $\rho  + \delta  \approx 0$ and $\phi  = 1 + \rho  - \delta  \approx 1$, the variance of $\mathbf{C}$ conditional on $X_0$ and other parameters is close to diagonal with equal variances equal to 
+
+\[\frac{1}{v}\frac{{{X_0}}}{V} = \frac{1}{v}\operatorname{E} \left( {{C_0}} \right)\]
+
+This would seem to allow a relatively simple mixed effects model for concentrations.
+
+**REVIEW THE REST**
+
+Can we use this to improve our ability to identify papameters in the population model?
+
+In our example, we have a model for the conditional distribution
+of $X_1, X_2, X_3$ conditional on $X_0$. Also, $V$ is essentially unknown.
+
+We have measurements on $C_0, C_1, C_2, C_3$.
+
+and expectations and variances conditional on $X_0$.
+
+\[\begin{aligned}
+  \operatorname{E} \left( {\left[ {\begin{array}{*{20}{c}}
+  {{C_0}} \\ 
+  {{C_1}} \\ 
+  {{C_2}} \\ 
+  {{C_3}} 
+\end{array}} \right]|{X_0}} \right) =  & {X_0}\left[ {\begin{array}{*{20}{c}}
+  1 \\ 
+  {{\mu _1}(\theta )} \\ 
+  {{\mu _2}(\theta )} \\ 
+  {{\mu _3}(\theta )} 
+\end{array}} \right] \\ 
+  \operatorname{Var} \left( {\left[ {\begin{array}{*{20}{c}}
+  {{X_1}} \\ 
+  {{X_2}} \\ 
+  {{X_3}} 
+\end{array}} \right]|{X_0}} \right) =  & {X_0}\left[ {\begin{array}{*{20}{c}}
+  {{\phi _{11}}(\theta )}&{{\phi _{12}}(\theta )}&{{\phi _{13}}(\theta )} \\ 
+  {}&{{\phi _{22}}(\theta )}&{{\phi _{23}}(\theta )} \\ 
+  {}&{}&{{\phi _{33}}(\theta )} 
+\end{array}} \right] \\ 
+\end{aligned} \]
+
+\[v{C_t}|{X_t} \sim \operatorname{Poisson} (v{X_t}/V)\]
+
+\[\begin{aligned}
+  \operatorname{E} \left( {v{C_t}|{X_t}} \right) =  & \operatorname{var} \left( {v{C_t}|{X_t}} \right) = v{X_t}/V \\ 
+  \operatorname{E} \left( {{C_t}|{X_t}} \right) =  & {X_t}/V \\ 
+  \operatorname{E} \left( {{C_t}} \right) =  & \operatorname{E} \left( { {X_t}} \right)/V \\ 
+  \operatorname{var} \left( {{C_t}|{X_t}} \right) =  & \frac{1}{v}{X_t}/V \\ 
+  \operatorname{var} \left( {{C_t}} \right) =  & \operatorname{E} \left( {\operatorname{var} \left( {{C_t}|{X_t}} \right)} \right) + \operatorname{var} \left( {\operatorname{E} \left( {{C_t}|{X_t}} \right)} \right) \\ 
+   =  & \frac{1}{{vV}}\operatorname{E} \left( {{X_t}} \right) + \frac{1}{{{V^2}}}\operatorname{var} \left( {{X_t}} \right) \\ 
+\end{aligned} \]
+
+\[\begin{aligned}
+  \operatorname{E} \left( {\left[ {\begin{array}{*{20}{c}}
+  {{C_0}} \\ 
+  {{C_1}} \\ 
+  {{C_2}} \\ 
+  {{C_3}} 
+\end{array}} \right]|{X_0}} \right) =  & {X_0}\left[ {\begin{array}{*{20}{c}}
+  1 \\ 
+  {{\mu _1}(\theta )} \\ 
+  {{\mu _2}(\theta )} \\ 
+  {{\mu _3}(\theta )} 
+\end{array}} \right] \\ 
+  \operatorname{Var} \left( {\left[ {\begin{array}{*{20}{c}}
+  {{X_1}} \\ 
+  {{X_2}} \\ 
+  {{X_3}} 
+\end{array}} \right]|{X_0}} \right) =  & {X_0}\left[ {\begin{array}{*{20}{c}}
+  {{\phi _{11}}(\theta )}&{{\phi _{12}}(\theta )}&{{\phi _{13}}(\theta )} \\ 
+  {}&{{\phi _{22}}(\theta )}&{{\phi _{23}}(\theta )} \\ 
+  {}&{}&{{\phi _{33}}(\theta )} 
+\end{array}} \right] \\ 
+\end{aligned} \]
+
+Now, 
+
+\[\begin{aligned}
+  \operatorname{cov} ({C_k},{C_l}|{X_0}) =  & \operatorname{E} \left( {\operatorname{cov} \left( {{C_k},{C_l}|{X_k},{X_l},{X_0}} \right)|{X_0}} \right) \\ 
+   &  + \operatorname{cov} \left( {\operatorname{E} \left( {{C_k}|{X_k},{X_l},{X_0}} \right),\operatorname{E} \left( {{C_l}|{X_k},{X_l},{X_0}} \right)|{X_0}} \right) \\ 
+   =  & 0 + \operatorname{cov} \left( {\frac{{{X_k}}}{V},\frac{{{X_l}}}{V}|{X_0}} \right) \\ 
+   =  & \frac{1}{{{V^2}}}\operatorname{cov} \left( {{X_k},{X_l}|{X_0}} \right) \\ 
+\end{aligned} \]
+
+Expressed in terms of the parameters for the population 
+distribution, we get:
+
+\[\operatorname{E} \left( {\left[ {\begin{array}{*{20}{c}}
+  {{C_0}} \\ 
+  {{C_1}} \\ 
+  {{C_2}} \\ 
+  {{C_3}} 
+\end{array}} \right]|{X_0}} \right) =   {X_0}/V\left[ {\begin{array}{*{20}{c}}
+  1 \\ 
+  {{\phi _1}} \\ 
+  {{\phi _1}{\phi _2}} \\ 
+  {{\phi _1}{\phi _2}{\phi _3}} 
+\end{array}} \right]\]
+
+\[\operatorname{Var} \left( {\left[ {\begin{array}{*{20}{c}}
+  {{C_0}} \\ 
+  {{C_1}} \\ 
+  {{C_2}} \\ 
+  {{C_3}} 
+\end{array}} \right]|{X_0}} \right) = {X_0}\left[ {\begin{array}{*{20}{c}}
+  x&x&x&x \\ 
+  x&{\frac{1}{{vV}}\operatorname{E} \left( {{X_t}} \right) + \frac{1}{{{V^2}}}\operatorname{var} \left( {{X_t}} \right)}&{\frac{{{v^2}}}{{{V^2}}}\operatorname{cov} \left( {{X_k},{X_l}|{X_0}} \right)}&x \\ 
+  {}&{}&x&x \\ 
+  {}&{}&{}&x 
+\end{array}} \right]\]
+
+
+
+
+
+
+\[E({X_0} + {d_1} + {d_2} +  \ldots  + {d_k}|{X_0},{d_1}, \ldots ,{d_l}) = \left( {{X_0} + {d_1} +  \ldots  + {d_l}} \right){\left( {1 + \beta  - \delta } \right)^{k - l}}\]
+
+
+
+\[E({X_t}|{X_0}) = {X_0}{\left( {1 + \beta  - \delta } \right)^t}\]
+
+
+
+### Stochastic model for population cell counts
+
+
+**This would seem relevant if we could observe the total cell count and thus use a model conditional on $X_T$, etc. ... but we'll derive it and then get a model for the concentrations.**
+
+**The main concern is that the model will depend on a number of unidentifiable 'parameters', e.g. $X_0$ and the total volume $V$. Hopefully we'll be able to get rid of them asymptotically or somehow.**
+
+However, we only observe a concentration taken from a standard volume of blood. So it's a Poisson sample from a Poisson process. 
+
+#### Model for a single cell population
+
+Suppose that the population of a particular type of cell develops through a birth and death Poisson process in which each has probability $\rho$ or reproducing and a probability $\delta$ of dying in one unit of time. Assume that the unit is sufficiently small, hence also $\rho$ and $\delta$, and that the two processes can be treated as independent. Let $X_0$ be the number of cells at time 0 and consider small increments of time $t_1$, $t_2$ and $t_3$. Let $d_1$, $d_2$, $d_3$ be the changes in the number of cells from time 0 to time $t_1$, from time $t_1$ to time $t_1 + t_2$ and from time $t_1 + t_2$ to time $t_1 + t_2 + t_3$ respectively.
+
+Let $X_t$ denote the number of cells at time $t$, then 
+\[{X_{t + 1}} = {X_t} + {R_t} - {D_t}\]
+where $R_t \sim \text{Poisson}(\rho)$ and 
+$D_t \sim \text{Poisson}(\delta)$.
+
+So, approximately:
+
+\[\begin{aligned}
+  {\text{E}}({d_1}) =  & \left( {\rho  - \delta } \right){t_1}{X_0} \\ 
+  \operatorname{var} ({d_1}) =  & \left( {\beta  + \delta } \right){t_1}{X_0} \\ 
+  {\text{E}}({d_2}|{d_1}) =  & \left( {\beta  - \delta } \right){t_2}\left( {{X_0} + {d_1}} \right) \\ 
+  \operatorname{var} ({d_2}|{d_1}) =  & \left( {\beta  + \delta } \right){t_2}\left( {{X_0} + {d_1}} \right) \\ 
+  {\text{E}}({d_3}|{d_1},{d_2}) =  & \left( {\beta  - \delta } \right){t_3}\left( {{X_0} + {d_1} + {d_2}} \right) \\ 
+  \operatorname{var} ({d_3}|{d_1},{d_2}) =  & \left( {\beta  + \delta } \right){t_3}\left( {{X_0} + {d_1} + {d_2}} \right) \\ 
+\end{aligned} \]
+
+and 
+
+\[\begin{aligned}
+  {\text{E}}({d_2}) =  & \left( {\beta  - \delta } \right){t_2}\left( {{X_0} + \left( {\beta  - \delta } \right){t_1}{X_0}} \right) \\ 
+   =  & \left[ {\left( {\beta  - \delta } \right){t_2} + {{\left( {\beta  - \delta } \right)}^2}{t_1}{t_2}} \right]{X_0} \\ 
+  E({d_3}) =  & \left( {\beta  - \delta } \right){t_3}\left( {1 + \left( {\beta  - \delta } \right){t_1} + \left[ {\left( {\beta  - \delta } \right){t_2} + {{\left( {\beta  - \delta } \right)}^2}{t_1}{t_2}} \right]} \right){X_0} \\ 
+   =  & \left( {\left( {\beta  - \delta } \right){t_3} + \left( {\beta  - \delta } \right){t_3}\left( {\beta  - \delta } \right){t_1} + \left( {\beta  - \delta } \right){t_3}\left[ {\left( {\beta  - \delta } \right){t_2} + {{\left( {\beta  - \delta } \right)}^2}{t_1}{t_2}} \right]} \right){X_0} \\ 
+   =  & \left( {\left( {\beta  - \delta } \right){t_3} + {{\left( {\beta  - \delta } \right)}^2}\left( {{t_3}{t_1} + {t_3}{t_2}} \right) + {{\left( {\beta  - \delta } \right)}^3}{t_1}{t_2}{t_3}} \right){X_0} \\ 
+\end{aligned} \]
+
+
+
+
+
+
+
+
+
+
+**Continue with "eqn limiting distribution of cell in ....."
+and formulas in photo (check consistency)**
+
+
+
 
 ## Model for T-cell dynamics
 
@@ -121,7 +720,6 @@ and the variance-covariance matrix is
   \lambda &{{\delta _N}{N_t}}&{{\psi _N}{N_t}}&{{\delta _S}{S_t}}&{{\psi _S}{S_t}}&{{\delta _C}{C_t}}&{{\psi _C}{C_t}}&{{\delta _T}{T_t}}&{{\psi _T}{T_t}}&{{\delta _E}{E_t}} 
 \end{array}} \right)} \right]A'\]
 
-
 \[ = \left[ {\begin{array}{*{20}{c}}
   {\lambda  + {N_t}\left( {{\delta _N} + {\psi _N}} \right)}&{ - {\psi _N}{N_t}}&0&0&0 \\ 
   { - {\psi _N}{N_t}}&{{\psi _N}{N_t} + {S_t}\left( {{\delta _S} + {\psi _S}} \right)}&{ - {\psi _S}{S_t}}&0&0 \\ 
@@ -132,11 +730,71 @@ and the variance-covariance matrix is
 
 This formulation of the model allows an unconstrained parametrization by using the log of each parameter, each of which is positive, as the actual working parameter for optimization.
 
-### Adjustment for cell densities from blood samples of different volumes
+### Equilibrium and stability conditions
 
-If the response variable is either a number of cells counted in a situation in which the volume of the sample from which cells are counted varies from observation to observation or if the response a cell density, i.e. number of cells observed divided by the volume of the sample examined, then the model above needs to be adjusted.
+\[E\left( {\Delta \left[ {\begin{array}{*{20}{c}}
+  {{N_{t + 1}}} \\ 
+  {{S_{t + 1}}} \\ 
+  {{C_{t + 1}}} \\ 
+  {{T_{t + 1}}} \\ 
+  {{E_{t + 1}}} 
+\end{array}} \right]} \right) = \left[ {\begin{array}{*{20}{c}}
+  {\lambda  - {\delta _N}{N_t} - {\psi _N}{N_t}} \\ 
+  {{\psi _N}{N_t} - {\delta _S}S - {\psi _S}{S_t}} \\ 
+  {{\psi _S}{S_t} - {\delta _C}{C_t} - {\psi _C}{C_t}} \\ 
+  {{\psi _C}{C_t} - {\delta _T}{T_t} - {\psi _T}{T_t}} \\ 
+  {{\psi _T}{T_t} - {\delta _E}{E_t}} 
+\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+  {\lambda  - {N_t}\left( {{\delta _N} + {\psi _N}} \right)} \\ 
+  {{\psi _N}{N_t} - {S_t}\left( {{\delta _S} + {\psi _S}} \right)} \\ 
+  {{\psi _S}{S_t} - {C_t}\left( {{\delta _C} + {\psi _C}} \right)} \\ 
+  {{\psi _C}{C_t} - {T_t}\left( {{\delta _T} + {\psi _T}} \right)} \\ 
+  {{\psi _T}{T_t} - {\delta _E}{E_t}} 
+\end{array}} \right] 
+\]
 
-Let $X_t, Y_t$ be cells densities observed in a smaple of volume $V_t$. Let $X_t^c, Y_t^c$ be the actual counts so that
+\[E\left( {\Delta \left[ {\begin{array}{*{20}{c}}
+  {{N_{t + 1}}} \\ 
+  {{S_{t + 1}}} \\ 
+  {{C_{t + 1}}} \\ 
+  {{T_{t + 1}}} \\ 
+  {{E_{t + 1}}} 
+\end{array}} \right]} \right) 
+= \left[ {\begin{array}{*{20}{c}}
+  {\lambda  - {N_t}\left( {{\delta _N} + {\psi _N}} \right)} \\ 
+  {{\psi _N}{N_t} - {S_t}\left( {{\delta _S} + {\psi _S}} \right)} \\ 
+  {{\psi _S}{S_t} - {C_t}\left( {{\delta _C} + {\psi _C}} \right)} \\ 
+  {{\psi _C}{C_t} - {T_t}\left( {{\delta _T} + {\psi _T}} \right)} \\ 
+  {{\psi _T}{T_t} - {\delta _E}{E_t}} 
+\end{array}} \right] \\
+= \left[ {\begin{array}{*{20}{c}}
+  \lambda &{ - \left( {{\delta _N} + {\psi _N}} \right)}&0&0&0&0 \\ 
+  0&{{\psi _N}}&{ - \left( {{\delta _S} + {\psi _S}} \right)}&0&0&0 \\ 
+  0&0&{{\psi _S}}&{ - \left( {{\delta _C} + {\psi _C}} \right)}&0&0 \\ 
+  0&0&0&{{\psi _C}}&{ - \left( {{\delta _T} + {\psi _T}} \right)}&0 \\ 
+  0&0&0&0&{{\psi _T}}&{ - {\delta _E}} 
+\end{array}} 
+\right]\left[ {\begin{array}{*{20}{c}}
+  1 \\ 
+  {{N_t}} \\ 
+  {{S_t}} \\ 
+  {{C_t}} \\ 
+  {{T_t}} \\ 
+  {{E_t}} 
+\end{array}} \right]\]
+
+
+
+
+
+
+
+
+### Adjustment for cell concentrations from blood samples of different volumes
+
+If the response variable is either a number of cells counted in a situation in which the volume of the sample from which cells are counted varies from observation to observation or if the response is a cell concentration, i.e. number of cells observed divided by the volume of the sample examined, then the model above needs to be adjusted.
+
+Let $X_t, Y_t$ be cells concentrations observed in a smaple of volume $V_t$. Let $X_t^c, Y_t^c$ be the actual counts so that
 \[\left( {\begin{array}{*{20}{c}}
   {{X_t}} \\ 
   {{Y_t}} 
@@ -166,12 +824,12 @@ $\frac{1}{{{V_t}}}\left( {\begin{array}{*{20}{c}}
 \end{array}} \right]$, respectively.
 
 Thus, blood sample volumes that vary between measurements can be taken into account but need to be incorporated into the model.
-Simply standardizing by, for example, multiplying the densities
+Simply standardizing by, for example, multiplying the concentrations
 so they refer to a common volume will not work since the resulting
 relationship between the expectation and the variance of the
 response variables will not be that obtained above assuming Poisson components.
 
-If the measurements are cell densities that are always obtained from the same blood volume, then the easiest approch is to multiply each obervation by the common value of $V$ which will yield the cell counts modeled as discussed in the previous sections. 
+If the measurements are cell concentrations that are always obtained from the same blood volume, then the easiest approch is to multiply each obervation by the common value of $V$ which will yield the cell counts modeled as discussed in the previous sections. 
 
 ## Using mixed models
 

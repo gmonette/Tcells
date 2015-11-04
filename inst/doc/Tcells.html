@@ -10,7 +10,7 @@
 
 <meta name="author" content="GM + ?" />
 
-<meta name="date" content="2015-07-08" />
+<meta name="date" content="2015-07-18" />
 
 <title>T-cell dynamics</title>
 
@@ -28,18 +28,26 @@
 <div id="header">
 <h1 class="title">T-cell dynamics</h1>
 <h4 class="author"><em>GM + ?</em></h4>
-<h4 class="date"><em>2015-07-08</em></h4>
+<h4 class="date"><em>2015-07-18</em></h4>
 </div>
 
 <div id="TOC">
 <ul>
+<li><a href="#life-and-death-cell-processes-todo-todo">Life and death cell processes TODO TODO</a></li>
 <li><a href="#model-for-t-cell-dynamics">Model for T-cell dynamics</a><ul>
-<li><a href="#adjustment-for-cell-densities-from-blood-samples-of-different-volumes">Adjustment for cell densities from blood samples of different volumes</a></li>
+<li><a href="#equilibrium-and-stability-conditions">Equilibrium and stability conditions</a></li>
+<li><a href="#adjustment-for-cell-concentrations-from-blood-samples-of-different-volumes">Adjustment for cell concentrations from blood samples of different volumes</a></li>
 </ul></li>
 <li><a href="#using-mixed-models">Using mixed models</a></li>
 </ul>
 </div>
 
+<div id="life-and-death-cell-processes-todo-todo" class="section level2">
+<h2>Life and death cell processes TODO TODO</h2>
+<p>Is this a link to Plans: <a href="Plans.html">link to Plans</a></p>
+<p>Suppose that the population of a particular type of cell develops through a birth and death Poisson process in which each has probability <span class="math">\(\beta\)</span> or reproducing and a probability <span class="math">\(\delta\)</span> of dying in one unit of time. Assume that the unit is sufficiently small, hence also <span class="math">\(\beta\)</span> and <span class="math">\(\delta\)</span>, that the two processes can be treated as independent. Let <span class="math">\(X_0\)</span> be the number of cells at time 0 and consider small increments of time <span class="math">\(t_1\)</span>, <span class="math">\(t_2\)</span> and <span class="math">\(t_3\)</span>. Let <span class="math">\(d_1\)</span>, <span class="math">\(d_2\)</span>, <span class="math">\(d_3\)</span> be the changes in the number of cells from time 0 to time <span class="math">\(t_1\)</span>, from time <span class="math">\(t_1\)</span> to time <span class="math">\(t_1 + t_2\)</span> and from time <span class="math">\(t_1 + t_2\)</span> to time <span class="math">\(t_1 + t_2 + t_3\)</span> respectively.</p>
+<p><strong>Continue with “eqn limiting distribution of cell in …..” and formulas in photo (check consistency)</strong></p>
+</div>
 <div id="model-for-t-cell-dynamics" class="section level2">
 <h2>Model for T-cell dynamics</h2>
 <p>Subjects are observed at a number of occasions at different times. On each occasion the densities of cells of five different types are recorded.</p>
@@ -133,18 +141,67 @@
   0&amp;0&amp;0&amp;{ - {\psi _T}{T_t}}&amp;{{\psi _T}{T_t} + {\delta _E}{E_t}} 
 \end{array}} \right]\]</span></p>
 <p>This formulation of the model allows an unconstrained parametrization by using the log of each parameter, each of which is positive, as the actual working parameter for optimization.</p>
-<div id="adjustment-for-cell-densities-from-blood-samples-of-different-volumes" class="section level3">
-<h3>Adjustment for cell densities from blood samples of different volumes</h3>
-<p>If the response variable is either a number of cells counted in a situation in which the volume of the sample from which cells are counted varies from observation to observation or if the response a cell density, i.e. number of cells observed divided by the volume of the sample examined, then the model above needs to be adjusted.</p>
-<p>Let <span class="math">\(X_t, Y_t\)</span> be cells densities observed in a smaple of volume <span class="math">\(V_t\)</span>. Let <span class="math">\(X_t^c, Y_t^c\)</span> be the actual counts so that <span class="math">\[\left( {\begin{array}{*{20}{c}}
+<div id="equilibrium-and-stability-conditions" class="section level3">
+<h3>Equilibrium and stability conditions</h3>
+<p><span class="math">\[E\left( {\Delta \left[ {\begin{array}{*{20}{c}}
+  {{N_{t + 1}}} \\ 
+  {{S_{t + 1}}} \\ 
+  {{C_{t + 1}}} \\ 
+  {{T_{t + 1}}} \\ 
+  {{E_{t + 1}}} 
+\end{array}} \right]} \right) = \left[ {\begin{array}{*{20}{c}}
+  {\lambda  - {\delta _N}{N_t} - {\psi _N}{N_t}} \\ 
+  {{\psi _N}{N_t} - {\delta _S}S - {\psi _S}{S_t}} \\ 
+  {{\psi _S}{S_t} - {\delta _C}{C_t} - {\psi _C}{C_t}} \\ 
+  {{\psi _C}{C_t} - {\delta _T}{T_t} - {\psi _T}{T_t}} \\ 
+  {{\psi _T}{T_t} - {\delta _E}{E_t}} 
+\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+  {\lambda  - {N_t}\left( {{\delta _N} + {\psi _N}} \right)} \\ 
+  {{\psi _N}{N_t} - {S_t}\left( {{\delta _S} + {\psi _S}} \right)} \\ 
+  {{\psi _S}{S_t} - {C_t}\left( {{\delta _C} + {\psi _C}} \right)} \\ 
+  {{\psi _C}{C_t} - {T_t}\left( {{\delta _T} + {\psi _T}} \right)} \\ 
+  {{\psi _T}{T_t} - {\delta _E}{E_t}} 
+\end{array}} \right] 
+\]</span></p>
+<p><span class="math">\[E\left( {\Delta \left[ {\begin{array}{*{20}{c}}
+  {{N_{t + 1}}} \\ 
+  {{S_{t + 1}}} \\ 
+  {{C_{t + 1}}} \\ 
+  {{T_{t + 1}}} \\ 
+  {{E_{t + 1}}} 
+\end{array}} \right]} \right) = \left[ {\begin{array}{*{20}{c}}
+  {\lambda  - {N_t}\left( {{\delta _N} + {\psi _N}} \right)} \\ 
+  {{\psi _N}{N_t} - {S_t}\left( {{\delta _S} + {\psi _S}} \right)} \\ 
+  {{\psi _S}{S_t} - {C_t}\left( {{\delta _C} + {\psi _C}} \right)} \\ 
+  {{\psi _C}{C_t} - {T_t}\left( {{\delta _T} + {\psi _T}} \right)} \\ 
+  {{\psi _T}{T_t} - {\delta _E}{E_t}} 
+\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}
+  \lambda &amp;{ - \left( {{\delta _N} + {\psi _N}} \right)}&amp;0&amp;0&amp;0&amp;0 \\ 
+  0&amp;{{\psi _N}}&amp;{ - \left( {{\delta _S} + {\psi _S}} \right)}&amp;0&amp;0&amp;0 \\ 
+  0&amp;0&amp;{{\psi _S}}&amp;{ - \left( {{\delta _C} + {\psi _C}} \right)}&amp;0&amp;0 \\ 
+  0&amp;0&amp;0&amp;{{\psi _C}}&amp;{ - \left( {{\delta _T} + {\psi _T}} \right)}&amp;0 \\ 
+  0&amp;0&amp;0&amp;0&amp;{{\psi _T}}&amp;{ - {\delta _E}} 
+\end{array}} \right]\left[ {\begin{array}{*{20}{c}}
+  1 \\ 
+  {{N_t}} \\ 
+  {{S_t}} \\ 
+  {{C_t}} \\ 
+  {{T_t}} \\ 
+  {{E_t}} 
+\end{array}} \right]\]</span></p>
+</div>
+<div id="adjustment-for-cell-concentrations-from-blood-samples-of-different-volumes" class="section level3">
+<h3>Adjustment for cell concentrations from blood samples of different volumes</h3>
+<p>If the response variable is either a number of cells counted in a situation in which the volume of the sample from which cells are counted varies from observation to observation or if the response is a cell concentration, i.e. number of cells observed divided by the volume of the sample examined, then the model above needs to be adjusted.</p>
+<p>Let <span class="math">\(X_t, Y_t\)</span> be cells concentrations observed in a smaple of volume <span class="math">\(V_t\)</span>. Let <span class="math">\(X_t^c, Y_t^c\)</span> be the actual counts so that <span class="math">\[\left( {\begin{array}{*{20}{c}}
   {{X_t}} \\ 
   {{Y_t}} 
 \end{array}} \right) = \frac{1}{{{V_t}}}\left( {\begin{array}{*{20}{c}}
   {X_t^c} \\ 
   {Y_t^c} 
 \end{array}} \right)\]</span> If <span class="math">\(\left( {\begin{array}{*{20}{c}}  {X_t^c} \\  {Y_t^c} \end{array}} \right)\)</span> has expectation <span class="math">\(\left( {\begin{array}{*{20}{c}}  {{\mu _X}} \\  {{\mu _Y}} \end{array}} \right)\)</span> and variance <span class="math">\(\left[ {\begin{array}{*{20}{c}}  {{\sigma _{XX}}}&amp;{{\sigma _{XY}}} \\  {{\sigma _{YX}}}&amp;{{\sigma _{YY}}} \end{array}} \right]\)</span> then the expectation and variance of <span class="math">\((X_t, Y_t)'\)</span> will be <span class="math">\(\frac{1}{{{V_t}}}\left( {\begin{array}{*{20}{c}}  {{\mu _X}} \\  {{\mu _Y}} \end{array}} \right)\)</span> and <span class="math">\(\frac{1}{{V_t^2}}\left[ {\begin{array}{*{20}{c}}  {{\sigma _{XX}}}&amp;{{\sigma _{XY}}} \\  {{\sigma _{YX}}}&amp;{{\sigma _{YY}}} \end{array}} \right]\)</span>, respectively.</p>
-<p>Thus, blood sample volumes that vary between measurements can be taken into account but need to be incorporated into the model. Simply standardizing by, for example, multiplying the densities so they refer to a common volume will not work since the resulting relationship between the expectation and the variance of the response variables will not be that obtained above assuming Poisson components.</p>
-<p>If the measurements are cell densities that are always obtained from the same blood volume, then the easiest approch is to multiply each obervation by the common value of <span class="math">\(V\)</span> which will yield the cell counts modeled as discussed in the previous sections.</p>
+<p>Thus, blood sample volumes that vary between measurements can be taken into account but need to be incorporated into the model. Simply standardizing by, for example, multiplying the concentrations so they refer to a common volume will not work since the resulting relationship between the expectation and the variance of the response variables will not be that obtained above assuming Poisson components.</p>
+<p>If the measurements are cell concentrations that are always obtained from the same blood volume, then the easiest approch is to multiply each obervation by the common value of <span class="math">\(V\)</span> which will yield the cell counts modeled as discussed in the previous sections.</p>
 </div>
 </div>
 <div id="using-mixed-models" class="section level2">
